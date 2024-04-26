@@ -1,0 +1,19 @@
+body {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column; 
+  justify-content: center;
+  align-items: center;
+}
+
+table {
+  border: 1px solid black;
+  padding: 1rem;
+}
+
+td {
+  height: 1rem;
+  width: 1rem;
+  background-color: dodgerblue;
+}
