@@ -13,66 +13,78 @@ var goalPosition = null;
 var startCreated = false;
 var startPosition = null;
 
+// Initialize Domain on load
+makeDomain(30, 20);
 
+// Global event listeners
 document.addEventListener('mousedown', () => {
   isMouseDown = true;
 })
-
 document.addEventListener('mouseup', () => {
   isMouseDown = false;
 })
 
-// Dragging
-for (var i = 0; i < cells.length; i++) {
-  cells[i].addEventListener('mousemove', (e) => {
-    if (!isMouseDown) return;
-
-    if (e.target.style.backgroundColor === 'green') goalCreated = false;
-    else if (e.target.style.backgroundColor === 'orange') startCreated = false;
-
-    if (isObstacle) {
-      e.target.style.backgroundColor = 'red';
-    } 
-    else if (isEraser) {
-      e.target.style.backgroundColor = 'dodgerblue';
-    }
-  });
+// Make domain
+function makeDomain(x, y) {
+  var container = document.getElementById('table-container');
+  var table = document.createElement('table');
+  for (var i = 0; i < y; i++) {
+    var row = document.createElement('tr');
+    for (var j = 0; j < x; j++) {
+      var cell = document.createElement('td');
+      cell.id = `${i},${j}`;
+      cell.addEventListener('click', e => clickable(e));
+      cell.addEventListener('mousemove', e => draggable(e));
+      row.appendChild(cell);
+    };
+    table.appendChild(row);
+  }
+  container.appendChild(table);
 }
 
-// Clicking
-for (var i = 0; i < cells.length; i++) {
-  cells[i].addEventListener('click', (e) => {
-    if (e.target.style.backgroundColor === 'green') goalCreated = false;
-    else if (e.target.style.backgroundColor === 'orange') startCreated = false;
+function clickable(e) {
+  if (e.target.style.backgroundColor === 'green') goalCreated = false;
+  else if (e.target.style.backgroundColor === 'orange') startCreated = false;
 
-    if (isEraser) {
-      e.target.style.backgroundColor = 'dodgerblue';
+  if (isEraser) {
+    e.target.style.backgroundColor = 'dodgerblue';
+  }
+  else if (isObstacle) {
+    e.target.style.backgroundColor = 'red';
+  }
+  else if (isGoal) {
+    if (goalCreated) {
+      alert('Goal already created');
+      return;
     }
-    else if (isObstacle) {
-      e.target.style.backgroundColor = 'red';
+    e.target.style.backgroundColor = 'green';
+    goalCreated = true;
+    goalPosition = e.target.id;
+  }
+  else if (isStart) {
+    if (startCreated) {
+      alert('Start already created');
+      return;
     }
-    else if (isGoal) {
-      if (goalCreated) {
-        alert('Goal already created');
-        return;
-      }
-      e.target.style.backgroundColor = 'green';
-      goalCreated = true;
-      goalPosition = e.target.id;
-    }
-    else if (isStart) {
-      if (startCreated) {
-        alert('Start already created');
-        return;
-      }
-      e.target.style.backgroundColor = 'orange';
-      startCreated = true;
-      startPosition = e.target.id;
-    }
-  })
+    e.target.style.backgroundColor = 'orange';
+    startCreated = true;
+    startPosition = e.target.id;
+  };
 }
 
-// Eraser
+function draggable(e) {
+  if (!isMouseDown) return;
+  if (e.target.style.backgroundColor === 'green') goalCreated = false;
+  else if (e.target.style.backgroundColor === 'orange') startCreated = false;
+
+  if (isObstacle) {
+    e.target.style.backgroundColor = 'red';
+  } 
+  else if (isEraser) {
+    e.target.style.backgroundColor = 'dodgerblue';
+    }
+};
+// Domain button event listeners
 document.getElementById('eraser').addEventListener('click', () => {
   isEraser = true;
   isObstacle = false;
@@ -80,7 +92,6 @@ document.getElementById('eraser').addEventListener('click', () => {
   isGoal = false;
 })
 
-// Obstacle
 document.getElementById('obstacle').addEventListener('click', () => {
   isEraser = false;
   isObstacle = true;
@@ -88,23 +99,20 @@ document.getElementById('obstacle').addEventListener('click', () => {
   isGoal = false;
 })
 
-// Start
-document.getElementById('start').addEventListener('click', () => {
+document.getElementById('start-position').addEventListener('click', () => {
   isEraser = false;
   isObstacle = false; 
   isStart = true;
   isGoal = false;
 })
 
-// Goal
-document.getElementById('goal').addEventListener('click', () => {
+document.getElementById('goal-position').addEventListener('click', () => {
   isEraser = false;
   isObstacle = false;
   isStart = false;
   isGoal = true;
 })
 
-// Reset
 document.getElementById('reset').addEventListener('click', () => {
   for (var i = 0; i < cells.length; i++) {
     cells[i].style.backgroundColor = "dodgerblue";
@@ -113,8 +121,16 @@ document.getElementById('reset').addEventListener('click', () => {
   startCreated = false;
 })
 
-// Path: straight
-async function bestPath (start, end) {
+document.getElementById('run-algorithm').addEventListener('click', async () => {
+  const start = getNumberCoords(startPosition);
+  const goal = getNumberCoords(goalPosition);
+
+  await findPath(start, goal);
+})
+
+// Algorithms
+// Direct path to goal
+async function findPath(start, end) {
   current = start;
   while (current[0] !== end[0] || current[1] !== end[1]) {
     if (current[0] < end[0]) {
@@ -133,13 +149,6 @@ async function bestPath (start, end) {
   alert('Goal Reached!');
 }
 
-// Run
-document.getElementById('run').addEventListener('click', async () => {
-  const start = getNumberCoords(startPosition);
-  const goal = getNumberCoords(goalPosition);
-
-  await bestPath(start, goal);
-})
 
 // Turn string coords into array coords
 function getNumberCoords(coords) {
@@ -152,3 +161,4 @@ function getStringCoords(coords) {
   const stringCoords = coords.join(',');
   return stringCoords;
 }
+
