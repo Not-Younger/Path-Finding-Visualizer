@@ -1,5 +1,3 @@
-// Domain
-var cells = document.getElementsByTagName('td');
 // Global State
 var isMouseDown = false;
 // User state
@@ -43,47 +41,63 @@ function makeDomain(x, y) {
 }
 
 function clickable(e) {
-  if (e.target.style.backgroundColor === 'green') goalCreated = false;
-  else if (e.target.style.backgroundColor === 'orange') startCreated = false;
+  const cell = e.target;
+  if (cell.classList.contains('goal')) goalCreated = false;
+  else if (cell.classList.contains('start')) startCreated = false;
 
-  if (isEraser) {
-    e.target.style.backgroundColor = 'dodgerblue';
-  }
-  else if (isObstacle) {
-    e.target.style.backgroundColor = 'red';
+  cell.classList.remove('obstacle');
+  cell.classList.remove('goal');
+  cell.classList.remove('start');
+
+  if (isObstacle) {
+    cell.style.backgroundColor = 'red';
+    cell.classList.add('obstacle');
   }
   else if (isGoal) {
     if (goalCreated) {
       alert('Goal already created');
       return;
     }
-    e.target.style.backgroundColor = 'green';
+    cell.style.backgroundColor = 'green';
+    cell.classList.add('goal');
     goalCreated = true;
-    goalPosition = e.target.id;
+    goalPosition = cell.id;
   }
   else if (isStart) {
     if (startCreated) {
       alert('Start already created');
       return;
     }
-    e.target.style.backgroundColor = 'orange';
+    cell.style.backgroundColor = 'orange';
+    cell.classList.add('start');
     startCreated = true;
-    startPosition = e.target.id;
-  };
+    startPosition = cell.id;
+  }
+  else if (isEraser) {
+    cell.style.backgroundColor = 'dodgerblue';
+  }
 }
 
 function draggable(e) {
   if (!isMouseDown) return;
-  if (e.target.style.backgroundColor === 'green') goalCreated = false;
-  else if (e.target.style.backgroundColor === 'orange') startCreated = false;
+
+  const cell = e.target;
+  if (cell.classList.contains('goal')) goalCreated = false;
+  else if (cell.classList.contains('start')) startCreated = false;
+
+  cell.classList.remove('obstacle');
+  cell.classList.remove('goal');
+  cell.classList.remove('start');
 
   if (isObstacle) {
-    e.target.style.backgroundColor = 'red';
+    cell.style.backgroundColor = 'red';
+    cell.classList.add('obstacle');
   } 
   else if (isEraser) {
-    e.target.style.backgroundColor = 'dodgerblue';
-    }
+    cell.style.backgroundColor = 'dodgerblue';
+  }
 };
+
 // Domain button event listeners
 document.getElementById('eraser').addEventListener('click', () => {
   isEraser = true;
@@ -114,7 +128,11 @@ document.getElementById('goal-position').addEventListener('click', () => {
 })
 
 document.getElementById('reset').addEventListener('click', () => {
+  const cells = document.getElementsByTagName('td');
   for (var i = 0; i < cells.length; i++) {
+    cells[i].classList.remove('obstacle');
+    cells[i].classList.remove('goal');
+    cells[i].classList.remove('start');
     cells[i].style.backgroundColor = "dodgerblue";
   }
   goalCreated = false;
@@ -131,18 +149,49 @@ document.getElementById('run-algorithm').addEventListener('click', async () => {
 // Algorithms
 // Direct path to goal
 async function findPath(start, end) {
-  current = start;
-  while (current[0] !== end[0] || current[1] !== end[1]) {
-    if (current[0] < end[0]) {
-      current[0]++;
-    } else if (current[0] > end[0]) {
-      current[0]--;
-    } else if (current[1] < end[1]) {
-      current[1]++;
-    } else if (current[1] > end[1]) {
-      current[1]--;
+  var currX = start[0];
+  var currY = start[1];
+  var endX = end[0];
+  var endY = end[1];
+
+  while (currX !== endX || currY !== endY) {
+    if (currX > endX && currY < endY) {
+      // move up and left
+      currX--;
+      currY++;
     }
-    const currStringCoords = getStringCoords(current);
+    else if (currX < endX && currY < endY) {
+      // move down and left
+      currX++;
+      currY++;
+    }
+    else if (currX < endX && currY > endY) {
+      // move down and right
+      currX++;
+      currY--;
+    }
+    else if (currX > endX && currY > endY) {
+      // move up and right
+      currX--;
+      currY--;
+    }
+    else if (currX > endX) {
+      // move up
+      currX--;
+    }
+    else if (currX < endX) {
+      // move down
+      currX++;
+    }
+    else if (currY > endY) {
+      // move right
+      currY--;
+    }
+    else if (currY < endY) {
+      // move left
+      currY++;
+    }
+    const currStringCoords = getStringCoords([currX, currY]);
     document.getElementById(currStringCoords).style.backgroundColor = 'purple';
     await new Promise(resolve => setTimeout(resolve, 100));
   }
@@ -150,15 +199,14 @@ async function findPath(start, end) {
 }
 
 
+// Helper functions
 // Turn string coords into array coords
 function getNumberCoords(coords) {
   const arrayCoords = coords.split(',').map(Number);
   return arrayCoords;
 }
-
 // Turn array coords string coords
 function getStringCoords(coords) {
   const stringCoords = coords.join(',');
   return stringCoords;
 }
-
