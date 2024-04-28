@@ -9,7 +9,10 @@ var isGoal = false;
 var isStart = false;
 // Domain state
 var goalCreated = false;
+var goalPosition = null;
 var startCreated = false;
+var startPosition = null;
+
 
 document.addEventListener('mousedown', () => {
   isMouseDown = true;
@@ -55,6 +58,7 @@ for (var i = 0; i < cells.length; i++) {
       }
       e.target.style.backgroundColor = 'green';
       goalCreated = true;
+      goalPosition = e.target.id;
     }
     else if (isStart) {
       if (startCreated) {
@@ -63,6 +67,7 @@ for (var i = 0; i < cells.length; i++) {
       }
       e.target.style.backgroundColor = 'orange';
       startCreated = true;
+      startPosition = e.target.id;
     }
   })
 }
@@ -107,3 +112,43 @@ document.getElementById('reset').addEventListener('click', () => {
   goalCreated = false;
   startCreated = false;
 })
+
+// Path: straight
+async function bestPath (start, end) {
+  current = start;
+  while (current[0] !== end[0] || current[1] !== end[1]) {
+    if (current[0] < end[0]) {
+      current[0]++;
+    } else if (current[0] > end[0]) {
+      current[0]--;
+    } else if (current[1] < end[1]) {
+      current[1]++;
+    } else if (current[1] > end[1]) {
+      current[1]--;
+    }
+    const currStringCoords = getStringCoords(current);
+    document.getElementById(currStringCoords).style.backgroundColor = 'purple';
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  alert('Goal Reached!');
+}
+
+// Run
+document.getElementById('run').addEventListener('click', async () => {
+  const start = getNumberCoords(startPosition);
+  const goal = getNumberCoords(goalPosition);
+
+  await bestPath(start, goal);
+})
+
+// Turn string coords into array coords
+function getNumberCoords(coords) {
+  const arrayCoords = coords.split(',').map(Number);
+  return arrayCoords;
+}
+
+// Turn array coords string coords
+function getStringCoords(coords) {
+  const stringCoords = coords.join(',');
+  return stringCoords;
+}
