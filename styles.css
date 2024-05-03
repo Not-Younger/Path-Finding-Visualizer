@@ -9,16 +9,40 @@ body {
 
 table {
   border: 1px solid black;
-  padding: 1rem;
   border-radius: 5px;
+  border-collapse: collapse 
 }
 
 td {
   height: 1rem;
   width: 1rem;
+  border: 1px solid white;
+}
+
+.obstacle {
+  background-color: red;
+}
+
+.start {
+  background-color: orange;
+}
+
+.goal {
+  background-color: green;
+}
+
+.empty {
   background-color: dodgerblue;
 }
 
 .guess {
   background-color: yellow;
+}
+
+.found {
+  background-color: lime;
+}
+
+.path {
+  background-color: purple;
 }

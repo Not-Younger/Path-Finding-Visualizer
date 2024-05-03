@@ -79,6 +79,7 @@ function makeDomain(x, y) {
       cell.id = `${i},${j}`;
       cell.addEventListener('click', e => clickable(e));
       cell.addEventListener('mousemove', e => draggable(e));
+      cell.classList.add('empty');
       row.appendChild(cell);
     };
     table.appendChild(row);
@@ -88,39 +89,31 @@ function makeDomain(x, y) {
 
 function clickable(e) {
   const cell = e.target;
+  // Check if trying to make another start/goal
+  if (isGoal && goalCreated) {alert('Goal already created'); return}
+  if (isStart && startCreated) {alert('Start already created'); return}
+  // Check if overwritting start/goal
   if (cell.classList.contains('goal')) goalCreated = false;
-  else if (cell.classList.contains('start')) startCreated = false;
-
-  cell.classList.remove('obstacle');
-  cell.classList.remove('goal');
-  cell.classList.remove('start');
-
-  if (isObstacle) {
-    cell.style.backgroundColor = 'red';
-    cell.classList.add('obstacle');
-  }
-  else if (isGoal) {
-    if (goalCreated) {
-      alert('Goal already created');
-      return;
-    }
-    cell.style.backgroundColor = 'green';
+  if (cell.classList.contains('start')) startCreated = false;
+  // Reset cell classes and then add relevant class
+  removeClasses(cell.id);
+  if (isGoal) {
     cell.classList.add('goal');
+    // Update goal existence and position
     goalCreated = true;
     goalPosition = cell.id;
   }
   else if (isStart) {
-    if (startCreated) {
-      alert('Start already created');
-      return;
-    }
-    cell.style.backgroundColor = 'orange';
     cell.classList.add('start');
+    // Update start existence and position
     startCreated = true;
     startPosition = cell.id;
   }
+  else if (isObstacle) {
+    cell.classList.add('obstacle');
+  }
   else if (isEraser) {
-    cell.style.backgroundColor = 'dodgerblue';
+    cell.classList.add('empty');
   }
 }
 
@@ -128,19 +121,17 @@ function draggable(e) {
   if (!isMouseDown) return;
 
   const cell = e.target;
+  if (isGoal || isStart) return;
+  // Check if overwritting start/goal
   if (cell.classList.contains('goal')) goalCreated = false;
-  else if (cell.classList.contains('start')) startCreated = false;
-
-  cell.classList.remove('obstacle');
-  cell.classList.remove('goal');
-  cell.classList.remove('start');
-
+  if (cell.classList.contains('start')) startCreated = false;
+  // Reset cell classes and then add relevant class
+  removeClasses(cell.id);
   if (isObstacle) {
-    cell.style.backgroundColor = 'red';
     cell.classList.add('obstacle');
   } 
   else if (isEraser) {
-    cell.style.backgroundColor = 'dodgerblue';
+    cell.classList.add('empty');
   }
 };
 
@@ -178,63 +169,29 @@ document.getElementById('reset').addEventListener('click', () => {
   for (var i = 0; i < cells.length; i++) {
     const cell = cells[i];
     cell.classList.remove('obstacle');
-    cell.classList.remove('goal');
     cell.classList.remove('start');
+    cell.classList.remove('goal');
     cell.classList.remove('guess');
     cell.classList.remove('found');
-    cell.style.backgroundColor = "dodgerblue";
+    cell.classList.remove('path');
+    cell.classList.add('empty');
   }
   goalCreated = false;
   startCreated = false;
+  goalPosition = null;
+  startPosition = null;
 })
 
-document.getElementById('run-algorithm').addEventListener('click', async () => {
+document.getElementById('bfs').addEventListener('click', async () => {
   const start = getNumberCoords(startPosition);
   const goal = getNumberCoords(goalPosition);
 
-  await findPath(start, goal);
-})
-
-document.getElementById('dijkstras').addEventListener('click', async () => {
-  const start = getNumberCoords(startPosition);
-  const goal = getNumberCoords(goalPosition);
-
-  await dijkstras(start, goal);
+  await bfs(start, goal);
 })
 
 // Algorithms
-// Direct path to goal
-async function findPath(start, end) {
-  var currX = start[0];
-  var currY = start[1];
-  var endX = end[0];
-  var endY = end[1];
-
-  while (currX !== endX || currY !== endY) {
-    if (currX > endX && !checkValid([currX - 1, currY])) {
-      // move up
-      currX--;
-    }
-    else if (currX < endX && !checkValid([currX + 1, currY])) {
-      // move down
-      currX++;
-    }
-    else if (currY > endY && !checkValid([currX, currY - 1])) {
-      // move right
-      currY--;
-    }
-    else if (currY < endY && !checkValid([currX, currY + 1])) {
-      // move left
-      currY++;
-    }
-    const currStringCoords = getStringCoords([currX, currY]);
-    document.getElementById(currStringCoords).style.backgroundColor = 'purple';
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
-  alert('Goal Reached!');
-}
-
-async function dijkstras(start, end) {
+// Breadth First Search
+async function bfs(start, end) {
   const startString = getStringCoords(start);
   const endString = getStringCoords(end);
   // Queue of string coords
@@ -278,8 +235,8 @@ async function dijkstras(start, end) {
     }
     await new Promise(resolve => setTimeout(resolve, 10));
   }
+  alert('No path found');
 }
-
 
 // Helper functions
 // Turn string coords into array coords
@@ -299,4 +256,12 @@ function checkValid(coords) {
   if (coords[1] < 0 || coords[1] >= width) return false;
   if (cell.classList.contains('obstacle')) return false;
   return true;
+}
+
+function removeClasses(id) {
+  const cell = document.getElementById(id);
+  cell.classList.remove('obstacle');
+  cell.classList.remove('goal');
+  cell.classList.remove('start');
+  cell.classList.remove('empty');
 }
