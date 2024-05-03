@@ -11,6 +11,7 @@ var goalCreated = false;
 var goalPosition = null;
 var startCreated = false;
 var startPosition = null;
+var pathFound = false;
 
 const width = 30;
 const height = 20;
@@ -182,42 +183,36 @@ document.getElementById('reset').addEventListener('click', () => {
   startPosition = null;
 })
 
-document.getElementById('bfs').addEventListener('click', async () => {
-  const start = getNumberCoords(startPosition);
-  const goal = getNumberCoords(goalPosition);
-
-  await bfs(start, goal);
+document.getElementById('bfs').addEventListener('click', () => {
+  if (!startCreated || !goalCreated) {
+    alert('Need to create a start and goal!');
+    return;
+  }
+  bfs(startPosition, goalPosition);
 })
 
 // Algorithms
 // Breadth First Search
 
 
-async function bfs(start, end) {
-  const startString = getStringCoords(start);
-  const endString = getStringCoords(end);
+async function bfs(startCoords, goalCoords) {
   // Map of previous coords
   let cells = {};
   // Queue of string coords
   const q = new Queue();
   // Set guess distance for start
-  document.getElementById(startString).classList.add('guess');
-  cells[startString] = '0';
-  q.enqueue(startString);
-
+  const start = document.getElementById(startCoords);
+  start.classList.add('guess');
+  cells[startCoords] = '0';
+  q.enqueue(startCoords);
   while (!q.isEmpty) {
     // Get string coords from queue
     const current = q.dequeue();
-    // Add shortest path
+    // Confirm shortest path
     document.getElementById(current).classList.add('found');
-    // Check if current is the goal
-    if (current === endString) {
-      alert('Goal Reached!');
-      return;
-    }
     // Get array coords from string coords
     const currentCoords = getNumberCoords(current);
-    // Check neighbors
+    // Get neighbor coords
     const neighbors = [
       [currentCoords[0] - 1, currentCoords[1]],
       [currentCoords[0] + 1, currentCoords[1]],
@@ -230,21 +225,32 @@ async function bfs(start, end) {
       getStringCoords(neighbors[2]),
       getStringCoords(neighbors[3])
     ]
-
     // Visit neighbors
     for (var i = 0; i < neighbors.length; i++) {
+      // Check if neighbor is in the domain
       if (!checkValid(neighbors[i])) continue;
+      // Get neighbor element
       const neighbor = document.getElementById(getStringCoords(neighbors[i]));
+      // Check if neighbor's path has already been found
       if (neighbor.classList.contains('found')) continue;
+      // Check if neighbor is already in the queue
       if (neighbor.classList.contains('guess')) continue;
-      // check if neighbor is goal
-      if (stringNeighbors[i] === endString) {
-        cells[stringNeighbors[i]] = current;
-        displayPath(cells, stringNeighbors[i]);
+      // Check if neighbor is goal
+      if (stringNeighbors[i] === goalCoords) {
+        // Add previous coords
+        cells[goalCoords] = current;
+        // Display the shortest path
+        displayPath(cells, startCoords, goalCoords);
+        // Update start styling
+        removeClasses(startCoords);
+        start.classList.add('start');
         return;
       }
+      // Add relevant class
       neighbor.classList.add('guess');
+      // Add previous coords
       cells[stringNeighbors[i]] = current;
+      // Add neighbor location to queue
       q.enqueue(stringNeighbors[i]);
     }
     await new Promise(resolve => setTimeout(resolve, 10));
@@ -278,16 +284,21 @@ function removeClasses(id) {
   cell.classList.remove('goal');
   cell.classList.remove('start');
   cell.classList.remove('empty');
+  cell.classList.remove('guess');
+  cell.classList.remove('found');
 }
 
-async function displayPath(cells, id) {
+async function displayPath(cells, start, goal) {
   let shortestPath = [];
-  let current = id;
+  let current = goal;
   while (current != '0') {
     shortestPath.push(current);
     current = cells[current];
   }
+  // Add path class to path
   for (let i = shortestPath.length - 1; i >= 0; i--) {
+    if (shortestPath[i] == start) continue;
+    if (shortestPath[i] == goal) continue;
     const cell = document.getElementById(shortestPath[i]);
     cell.classList.add('path');
     await new Promise(resolve => setTimeout(resolve, 10)); 

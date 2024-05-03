@@ -25,10 +25,12 @@ td {
 
 .start {
   background-color: orange;
+  cursor: pointer;
 }
 
 .goal {
   background-color: green;
+  cursor: pointer;
 }
 
 .empty {
