@@ -191,16 +191,18 @@ document.getElementById('bfs').addEventListener('click', async () => {
 
 // Algorithms
 // Breadth First Search
-let cells = {};
+
 
 async function bfs(start, end) {
   const startString = getStringCoords(start);
   const endString = getStringCoords(end);
+  // Map of previous coords
+  let cells = {};
   // Queue of string coords
   const q = new Queue();
   // Set guess distance for start
   document.getElementById(startString).classList.add('guess');
-  cells[startString] = 0;
+  cells[startString] = '0';
   q.enqueue(startString);
 
   while (!q.isEmpty) {
@@ -222,6 +224,13 @@ async function bfs(start, end) {
       [currentCoords[0], currentCoords[1] - 1],
       [currentCoords[0], currentCoords[1] + 1]
     ];
+    const stringNeighbors = [
+      getStringCoords(neighbors[0]),
+      getStringCoords(neighbors[1]),
+      getStringCoords(neighbors[2]),
+      getStringCoords(neighbors[3])
+    ]
+
     // Visit neighbors
     for (var i = 0; i < neighbors.length; i++) {
       if (!checkValid(neighbors[i])) continue;
@@ -229,14 +238,14 @@ async function bfs(start, end) {
       if (neighbor.classList.contains('found')) continue;
       if (neighbor.classList.contains('guess')) continue;
       // check if neighbor is goal
-      if (getStringCoords(neighbors[i]) === endString) {
-        alert('Goal Reached!');
-        console.log(cells);
+      if (stringNeighbors[i] === endString) {
+        cells[stringNeighbors[i]] = current;
+        displayPath(cells, stringNeighbors[i]);
         return;
       }
       neighbor.classList.add('guess');
-      cells[getStringCoords(neighbors[i])] = current;
-      q.enqueue(getStringCoords(neighbors[i]));
+      cells[stringNeighbors[i]] = current;
+      q.enqueue(stringNeighbors[i]);
     }
     await new Promise(resolve => setTimeout(resolve, 10));
   }
@@ -269,4 +278,18 @@ function removeClasses(id) {
   cell.classList.remove('goal');
   cell.classList.remove('start');
   cell.classList.remove('empty');
+}
+
+async function displayPath(cells, id) {
+  let shortestPath = [];
+  let current = id;
+  while (current != '0') {
+    shortestPath.push(current);
+    current = cells[current];
+  }
+  for (let i = shortestPath.length - 1; i >= 0; i--) {
+    const cell = document.getElementById(shortestPath[i]);
+    cell.classList.add('path');
+    await new Promise(resolve => setTimeout(resolve, 10)); 
+  }
 }
