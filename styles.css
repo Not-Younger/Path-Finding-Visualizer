@@ -16,7 +16,7 @@ table {
 td {
   height: 1rem;
   width: 1rem;
-  border: 1px solid white;
+  border: 1px solid black;
 }
 
 .obstacle {

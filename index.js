@@ -72,7 +72,7 @@ document.addEventListener('mouseup', () => {
 function makeDomain(x, y) {
   var container = document.getElementById('table-container');
   var table = document.createElement('table');
-  for (var i = 0; i < y; i++) {
+  for (var i = y-1; i >= 0; i--) {
     var row = document.createElement('tr');
     for (var j = 0; j < x; j++) {
       var cell = document.createElement('td');
@@ -191,6 +191,8 @@ document.getElementById('bfs').addEventListener('click', async () => {
 
 // Algorithms
 // Breadth First Search
+let cells = {};
+
 async function bfs(start, end) {
   const startString = getStringCoords(start);
   const endString = getStringCoords(end);
@@ -198,6 +200,7 @@ async function bfs(start, end) {
   const q = new Queue();
   // Set guess distance for start
   document.getElementById(startString).classList.add('guess');
+  cells[startString] = 0;
   q.enqueue(startString);
 
   while (!q.isEmpty) {
@@ -228,9 +231,11 @@ async function bfs(start, end) {
       // check if neighbor is goal
       if (getStringCoords(neighbors[i]) === endString) {
         alert('Goal Reached!');
+        console.log(cells);
         return;
       }
       neighbor.classList.add('guess');
+      cells[getStringCoords(neighbors[i])] = current;
       q.enqueue(getStringCoords(neighbors[i]));
     }
     await new Promise(resolve => setTimeout(resolve, 10));
