@@ -80,6 +80,7 @@ function makeDomain(x, y) {
       cell.id = `${i},${j}`;
       cell.addEventListener('click', e => clickable(e));
       cell.addEventListener('mousemove', e => draggable(e));
+      cell.addEventListener('mousedown', e => moveable(e));
       cell.classList.add('empty');
       row.appendChild(cell);
     };
@@ -88,15 +89,27 @@ function makeDomain(x, y) {
   container.appendChild(table);
 }
 
+// User controls
 function clickable(e) {
   const cell = e.target;
-  // Check if trying to make another start/goal
-  if (isGoal && goalCreated) {alert('Goal already created'); return}
-  if (isStart && startCreated) {alert('Start already created'); return}
-  // Check if overwritting start/goal
-  if (cell.classList.contains('goal')) goalCreated = false;
-  if (cell.classList.contains('start')) startCreated = false;
-  // Reset cell classes and then add relevant class
+  // Check if were trying to move the goal or start
+  if (!isEraser && cell.id == goalPosition) return;
+  if (!isEraser && cell.id == startPosition) return;
+  // Check if were moving the goal and update old goal to empty
+  if (isGoal && goalPosition != null) {
+    const goal = document.getElementById(goalPosition);
+    goal.classList.remove('goal');
+    goal.classList.add('empty');
+    goalCreated = false;
+  }
+  // Check if were moving the start and update old start to empty
+  if (isStart && startPosition != null) {
+    const start = document.getElementById(startPosition);
+    start.classList.remove('start');
+    start.classList.add('empty');
+    startCreated = false;
+  }
+  // Reset current cell classes and then add relevant class
   removeClasses(cell.id);
   if (isGoal) {
     cell.classList.add('goal');
@@ -114,6 +127,14 @@ function clickable(e) {
     cell.classList.add('obstacle');
   }
   else if (isEraser) {
+    if (cell.id == goalPosition) {
+      goalCreated = false;
+      goalPosition = null;
+    }
+    if (cell.id == startPosition) {
+      startCreated = false;
+      startPosition = null;
+    }
     cell.classList.add('empty');
   }
 }
@@ -134,7 +155,21 @@ function draggable(e) {
   else if (isEraser) {
     cell.classList.add('empty');
   }
-};
+}
+
+function moveable(e) {
+  const cell = e.target;
+  if (cell.id == goalPosition) {
+    console.log('moving goal');
+  }
+  if (cell.id == startPosition) {
+    console.log('moving start');
+  }
+}
+
+function move(e) {
+
+}
 
 // Domain button event listeners
 document.getElementById('eraser').addEventListener('click', () => {
@@ -184,17 +219,13 @@ document.getElementById('reset').addEventListener('click', () => {
 })
 
 document.getElementById('bfs').addEventListener('click', () => {
-  if (!startCreated || !goalCreated) {
-    alert('Need to create a start and goal!');
-    return;
-  }
+  // Check if start and goal exist
+  if (startPosition == null || goalPosition == null) return;
   bfs(startPosition, goalPosition);
 })
 
 // Algorithms
 // Breadth First Search
-
-
 async function bfs(startCoords, goalCoords) {
   // Map of previous coords
   let cells = {};
