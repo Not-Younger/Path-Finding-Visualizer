@@ -6,6 +6,10 @@ var isEraser = false;
 var isObstacle = true;
 var isGoal = false;
 var isStart = false;
+
+var focusStart = false;
+var focusGoal = false;
+
 // Domain state
 var goalCreated = false;
 var goalPosition = null;
@@ -79,8 +83,10 @@ function makeDomain(x, y) {
       var cell = document.createElement('td');
       cell.id = `${i},${j}`;
       cell.addEventListener('click', e => clickable(e));
-      cell.addEventListener('mousemove', e => draggable(e));
-      cell.addEventListener('mousedown', e => moveable(e));
+      cell.addEventListener('mousemove', e => drawable(e));
+      cell.addEventListener('mousedown', e => focus(e));
+      cell.addEventListener('mouseup', e => defocus(e));
+      cell.addEventListener('mousemove', e => draggable(e))
       cell.classList.add('empty');
       row.appendChild(cell);
     };
@@ -139,7 +145,7 @@ function clickable(e) {
   }
 }
 
-function draggable(e) {
+function drawable(e) {
   if (!isMouseDown) return;
 
   const cell = e.target;
@@ -157,18 +163,41 @@ function draggable(e) {
   }
 }
 
-function moveable(e) {
+function focus(e) {
   const cell = e.target;
-  if (cell.id == goalPosition) {
-    console.log('moving goal');
-  }
-  if (cell.id == startPosition) {
-    console.log('moving start');
-  }
+  if (cell.id != startPosition && cell.id != goalPosition) return;
+  if (cell.id == startPosition) focusStart = true;
+  else if (cell.id == goalPosition) focusGoal = true;
+  console.log(focusStart, focusGoal);
 }
 
-function move(e) {
+function defocus(e) {
+  const cell = e.target;
+  if (cell.id != startPosition && cell.id != goalPosition) return;
+  if (cell.id == startPosition) focusStart = false;
+  else if (cell.id == goalPosition) focusGoal = false;
+  console.log(focusStart, focusGoal);
+}
 
+function draggable(e) {
+  if (!isMouseDown) return;
+  const cell = e.target;
+  if (focusGoal) {
+    const previousGoal = document.getElementById(goalPosition);
+    previousGoal.classList.remove('goal');
+    previousGoal.classList.add('empty');
+    removeClasses(cell.id);
+    cell.classList.add('goal');
+    goalPosition = cell.id;
+  }
+  else if (focusStart) {
+    const previousStart = document.getElementById(startPosition);
+    previousStart.classList.remove('start');
+    previousStart.classList.add('empty');
+    removeClasses(cell.id);
+    cell.classList.add('start');
+    startPosition = cell.id;
+  }
 }
 
 // Domain button event listeners
