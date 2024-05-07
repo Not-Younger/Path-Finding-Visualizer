@@ -55,13 +55,9 @@ makeDomain(width, height);
 function toggleDarkMode() {
   darkMode = !darkMode;
   if (darkMode) {
-    document.body.style.backgroundColor = 'black';
-    document.body.style.color = 'white';
-    document.getElementsByTagName('table')[0].style.borderColor = 'white';
+    document.documentElement.classList.add('dark-theme');
   } else {
-    document.body.style.backgroundColor = 'white';
-    document.body.style.color = 'black';
-    document.getElementsByTagName('table')[0].style.borderColor = 'black';
+    document.documentElement.classList.remove('dark-theme');
   }
 }
 
@@ -168,7 +164,6 @@ function focus(e) {
   if (cell.id != startPosition && cell.id != goalPosition) return;
   if (cell.id == startPosition) focusStart = true;
   else if (cell.id == goalPosition) focusGoal = true;
-  console.log(focusStart, focusGoal);
 }
 
 function defocus(e) {
@@ -176,7 +171,6 @@ function defocus(e) {
   if (cell.id != startPosition && cell.id != goalPosition) return;
   if (cell.id == startPosition) focusStart = false;
   else if (cell.id == goalPosition) focusGoal = false;
-  console.log(focusStart, focusGoal);
 }
 
 function draggable(e) {

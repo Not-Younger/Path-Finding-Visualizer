@@ -1,3 +1,32 @@
+:root {
+  --main-bg-color: white;
+  --main-color: black;
+}
+
+html {
+  background-color: var(--main-bg-color);
+  color: var(--main-color);
+}
+
+html.dark-theme {
+  --main-bg-color: black;
+  --main-color: white;
+}
+
+button {
+  background-color: var(--main-bg-color);
+  color: var(--main-color);
+  border: 1px solid var(--main-color);
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+button:active {
+  transform: translateY(2px);;
+}
+
 body {
   width: 100vw;
   height: 100vh;
@@ -10,13 +39,21 @@ body {
 table {
   border: 1px solid black;
   border-radius: 5px;
-  border-collapse: collapse 
+  border-collapse: collapse;
+  margin: 1rem;
 }
 
 td {
   height: 1rem;
   width: 1rem;
   border: 1px solid black;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
 }
 
 .obstacle {
