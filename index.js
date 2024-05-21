@@ -14,11 +14,13 @@ var goalCreated = false;
 var goalPosition = null;
 var startCreated = false;
 var startPosition = null;
-var pathFound = false;
+var pathFound = true;
 
 const headerHeight = document.getElementsByTagName('header')[0].clientHeight;
 const x = Math.round(document.getElementById('table-container').clientWidth / 25);
 const y = Math.round((document.getElementById('table-container').clientHeight - headerHeight) / 25);
+
+var algorithmSpeed = 10;
 
 // Priority Queue
 class Queue {
@@ -95,8 +97,8 @@ function makeDomain() {
   const goalCoors = `${Math.floor(y/2)},${Math.floor(3*x/4)}`;
   const start = document.getElementById(startCoors);
   const goal = document.getElementById(goalCoors);
-  start.classList.remove('empty');
-  goal.classList.remove('empty');
+  start.classList.remove('unvisited');
+  goal.classList.remove('unvisited');
   start.classList.add('start');
   goal.classList.add('goal');
   startCreated = true;
@@ -157,6 +159,7 @@ function focus(e) {
   }
 }
 
+let previousCellType = null;
 function draggable(e) {
   e.preventDefault();
   if (!isMouseDown) return;
@@ -211,12 +214,12 @@ document.getElementById('reset').addEventListener('click', () => {
 document.getElementById('bfs').addEventListener('click', () => {
   // Check if start and goal exist
   if (startPosition == null || goalPosition == null) return;
-  bfs(startPosition, goalPosition);
+  bfs(startPosition, goalPosition, algorithmSpeed);
 })
 
 // Algorithms
 // Breadth First Search
-async function bfs(startCoords, goalCoords) {
+async function bfs(startCoords, goalCoords, delay) {
   // Map of coords: previous coords
   let cells = {};
   // Queue of string coords
@@ -240,22 +243,27 @@ async function bfs(startCoords, goalCoords) {
       if (!checkValid(neighbors[i])) continue;
       const neighborCoords = getStringCoords(neighbors[i]);
       const neighbor = document.getElementById(neighborCoords);
-      if (neighbor.classList.contains('visited')) continue;
+      if (neighbor.classList.contains('visited') || neighbor.classList.contains('visited-instant')) continue;
       // Check if neighbor is goal
       if (neighborCoords === goalCoords) {
         cells[goalCoords] = current;
-        displayPath(cells, startCoords, goalCoords);
+        displayPath(cells, startCoords, goalCoords, delay);
+        pathFound = true;
         removeClasses(startCoords);
         start.classList.add('start');
         return;
       }
       // Visit neighbor
       neighbor.classList.remove('unvisited');
-      neighbor.classList.add('visited');
+      if (!pathFound)
+        neighbor.classList.add('visited');
+      else
+        neighbor.classList.add('visited-instant');
       cells[neighborCoords] = current;
       q.enqueue(neighborCoords);
     }
-    await new Promise(resolve => setTimeout(resolve, 10));
+    if (!pathFound)
+      await new Promise(resolve => setTimeout(resolve, delay));
   }
   alert('No path found');
 }
@@ -286,11 +294,12 @@ function removeClasses(id) {
   cell.classList.remove('goal');
   cell.classList.remove('start');
   cell.classList.remove('visited');
+  cell.classList.remove('visited-instant');
   cell.classList.remove('unvisited');
   cell.classList.remove('path');
 }
 
-async function displayPath(cells, start, goal) {
+async function displayPath(cells, start, goal, delay) {
   // Get result path
   let resultPath = [];
   let current = goal;
@@ -305,6 +314,7 @@ async function displayPath(cells, start, goal) {
     const cell = document.getElementById(resultPath[i]);
     cell.classList.remove('visited');
     cell.classList.add('path');
-    await new Promise(resolve => setTimeout(resolve, 10)); 
+    if (!pathFound)
+      await new Promise(resolve => setTimeout(resolve, delay)); 
   }
 }
