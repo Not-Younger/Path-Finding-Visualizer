@@ -1,16 +1,40 @@
 :root {
-  --main-bg-color: white;
-  --main-color: black;
+  --main-bg-color: rgb(255, 255, 255);
+  --main-color: rgb(0, 0, 0);
+  --main-grid-color: rgb(56, 56, 248);
 }
 
 html {
   background-color: var(--main-bg-color);
   color: var(--main-color);
+  height: 100%;
+  margin: 0;
 }
 
 html.dark-theme {
   --main-bg-color: black;
-  --main-color: white;
+  --main-color: rgb(255, 255, 255);
+  --main-grid-color: rgb(255, 255, 255);
+}
+
+body {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex: none;
+  padding: 1rem;
+}
+
+h1 {
+  margin: 0;
 }
 
 button {
@@ -27,13 +51,8 @@ button:active {
   transform: translateY(2px);;
 }
 
-body {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column; 
-  justify-content: center;
-  align-items: center;
+#table-container {
+  flex: auto;
 }
 
 table {
@@ -44,16 +63,10 @@ table {
 }
 
 td {
-  height: 1rem;
-  width: 1rem;
-  border: 1px solid black;
-}
-
-.button-container {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  padding: 1rem;
+  height: 25px;
+  width: 25px;
+  border: 1px solid var(--main-grid-color);
+  padding: 0;
 }
 
 .obstacle {
@@ -72,7 +85,7 @@ td {
 }
 
 .empty {
-  background-color: dodgerblue;
+  background-color: white;
   cursor: pointer;
 }
 

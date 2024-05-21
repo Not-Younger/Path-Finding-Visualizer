@@ -2,7 +2,6 @@
 var darkMode = false;
 var isMouseDown = false;
 // User state
-var isEraser = false;
 var isObstacle = true;
 var isGoal = false;
 var isStart = false;
@@ -49,7 +48,7 @@ class Queue {
 }
 
 // Initialize Domain on load
-makeDomain(width, height);
+makeDomain();
 
 // Dark mode function
 function toggleDarkMode() {
@@ -70,7 +69,11 @@ document.addEventListener('mouseup', () => {
 })
 
 // Make domain
-function makeDomain(x, y) {
+function makeDomain() {
+  const headerHeight = document.getElementsByTagName('header')[0].clientHeight;
+  let x = Math.round(document.getElementById('table-container').clientWidth / 25);
+  let y = Math.round((document.getElementById('table-container').clientHeight - headerHeight) / 25);
+
   var container = document.getElementById('table-container');
   var table = document.createElement('table');
   for (var i = y-1; i >= 0; i--) {
@@ -89,6 +92,20 @@ function makeDomain(x, y) {
     table.appendChild(row);
   }
   container.appendChild(table);
+
+  // Add start and goal positions
+  const startCoors = `${Math.floor(y/2)},${Math.floor(x/4)}`;
+  const goalCoors = `${Math.floor(y/2)},${Math.floor(3*x/4)}`;
+  const start = document.getElementById(startCoors);
+  const goal = document.getElementById(goalCoors);
+  start.classList.remove('empty');
+  goal.classList.remove('empty');
+  start.classList.add('start');
+  goal.classList.add('goal');
+  startCreated = true;
+  goalCreated = true;
+  startPosition = startCoors;
+  goalPosition = goalCoors;
 }
 
 // User controls

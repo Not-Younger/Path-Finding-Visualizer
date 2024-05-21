@@ -6,20 +6,18 @@
     <link rel="stylesheet" type="text/css" href="styles.css">
   </head>
   <body>
-    <h1>Path Visualizer</h1>
-    <label for="theme-switcher">Dark Mode</label>
-    <input id="theme-switcher" type="checkbox" onclick="toggleDarkMode()" />
-
-    <div id="table-container">
-    </div>
-    
-    <div class="button-container">
+    <header>
+      <h1>Path Visualizer</h1>
       <button id="eraser">Eraser</button>
       <button id="obstacle">Obstacle</button>
       <button id="start-position">Start</button>
       <button id="goal-position">Goal</button>
       <button id="reset">Reset</button>
       <button id="bfs">BFS</button>
+      <button onclick="toggleDarkMode()">Mode</button>
+    </header>
+
+    <div id="table-container">
     </div>
     
     <script src="./index.js"></script>
