@@ -81,7 +81,7 @@ function makeDomain() {
       cell.addEventListener('click', e => clickable(e));
       cell.addEventListener('mousemove', e => drawable(e));
       cell.addEventListener('mousedown', e => focus(e));
-      cell.addEventListener('mouseup', e => defocus(e));
+      cell.addEventListener('mouseup', e => focus(e));
       cell.addEventListener('mousemove', e => draggable(e))
       cell.classList.add('empty');
       row.appendChild(cell);
@@ -140,33 +140,43 @@ function drawable(e) {
 
 function focus(e) {
   const cell = e.target;
-  if (cell.id != startPosition && cell.id != goalPosition) return;
-  if (cell.id == startPosition) focusStart = true;
-  else if (cell.id == goalPosition) focusGoal = true;
-}
-
-function defocus(e) {
-  const cell = e.target;
-  if (cell.id != startPosition && cell.id != goalPosition) return;
-  if (cell.id == startPosition) focusStart = false;
-  else if (cell.id == goalPosition) focusGoal = false;
+  if (cell.id == startPosition) {
+    focusStart = true;
+    focusGoal = false;
+  }
+  else if (cell.id == goalPosition) {
+    focusGoal = true;
+    focusStart = false;
+  }
+  else {
+    focusStart = false;
+    focusGoal = false;
+  }
 }
 
 function draggable(e) {
+  e.preventDefault();
   if (!isMouseDown) return;
+  if (!focusStart && !focusGoal) return;
   const cell = e.target;
   if (focusGoal) {
+    if (cell.classList.contains('start')) return;
     const previousGoal = document.getElementById(goalPosition);
+    // Reset previous goal to empty
     previousGoal.classList.remove('goal');
     previousGoal.classList.add('empty');
+    // Set new goal
     removeClasses(cell.id);
     cell.classList.add('goal');
     goalPosition = cell.id;
   }
   else if (focusStart) {
+    if (cell.classList.contains('goal')) return;
     const previousStart = document.getElementById(startPosition);
+    // Reset previous start to empty
     previousStart.classList.remove('start');
     previousStart.classList.add('empty');
+    // Set new start
     removeClasses(cell.id);
     cell.classList.add('start');
     startPosition = cell.id;
