@@ -16,8 +16,9 @@ var startCreated = false;
 var startPosition = null;
 var pathFound = false;
 
-const width = 30;
-const height = 20;
+const headerHeight = document.getElementsByTagName('header')[0].clientHeight;
+const x = Math.round(document.getElementById('table-container').clientWidth / 25);
+const y = Math.round((document.getElementById('table-container').clientHeight - headerHeight) / 25);
 
 // Priority Queue
 class Queue {
@@ -70,10 +71,6 @@ document.addEventListener('mouseup', () => {
 
 // Make domain
 function makeDomain() {
-  const headerHeight = document.getElementsByTagName('header')[0].clientHeight;
-  let x = Math.round(document.getElementById('table-container').clientWidth / 25);
-  let y = Math.round((document.getElementById('table-container').clientHeight - headerHeight) / 25);
-
   var container = document.getElementById('table-container');
   var table = document.createElement('table');
   for (var i = y-1; i >= 0; i--) {
@@ -343,8 +340,8 @@ function getStringCoords(coords) {
 
 function checkValid(coords) {
   const cell = document.getElementById(getStringCoords(coords));
-  if (coords[0] < 0 || coords[0] >= height) return false;
-  if (coords[1] < 0 || coords[1] >= width) return false;
+  if (coords[0] < 0 || coords[0] >= y) return false;
+  if (coords[1] < 0 || coords[1] >= x) return false;
   if (cell.classList.contains('obstacle')) return false;
   return true;
 }
