@@ -108,68 +108,33 @@ function makeDomain() {
 // User controls
 function clickable(e) {
   const cell = e.target;
-  // Check if were trying to move the goal or start
-  if (!isEraser && cell.id == goalPosition) return;
-  if (!isEraser && cell.id == startPosition) return;
-  // Check if were moving the goal and update old goal to empty
-  if (isGoal && goalPosition != null) {
-    const goal = document.getElementById(goalPosition);
-    goal.classList.remove('goal');
-    goal.classList.add('empty');
-    goalCreated = false;
-  }
-  // Check if were moving the start and update old start to empty
-  if (isStart && startPosition != null) {
-    const start = document.getElementById(startPosition);
-    start.classList.remove('start');
-    start.classList.add('empty');
-    startCreated = false;
-  }
-  // Reset current cell classes and then add relevant class
-  removeClasses(cell.id);
-  if (isGoal) {
-    cell.classList.add('goal');
-    // Update goal existence and position
-    goalCreated = true;
-    goalPosition = cell.id;
-  }
-  else if (isStart) {
-    cell.classList.add('start');
-    // Update start existence and position
-    startCreated = true;
-    startPosition = cell.id;
-  }
-  else if (isObstacle) {
-    cell.classList.add('obstacle');
-  }
-  else if (isEraser) {
-    if (cell.id == goalPosition) {
-      goalCreated = false;
-      goalPosition = null;
-    }
-    if (cell.id == startPosition) {
-      startCreated = false;
-      startPosition = null;
-    }
+  // Can't draw over start or goal
+  if (cell.classList.contains('start') || cell.classList.contains('goal')) return;
+  // Make cell an obstacle
+  if (cell.classList.contains('obstacle')) {
+    cell.classList.remove('obstacle');
     cell.classList.add('empty');
+  } else {
+    cell.classList.remove('empty');
+    cell.classList.add('obstacle');
   }
 }
 
+let previous = null;
 function drawable(e) {
   if (!isMouseDown) return;
-
+  if (previous == e.target) return;
   const cell = e.target;
-  if (isGoal || isStart) return;
-  // Check if overwritting start/goal
-  if (cell.classList.contains('goal')) goalCreated = false;
-  if (cell.classList.contains('start')) startCreated = false;
-  // Reset cell classes and then add relevant class
-  removeClasses(cell.id);
-  if (isObstacle) {
-    cell.classList.add('obstacle');
-  } 
-  else if (isEraser) {
+  previous = cell;
+  // Can't draw over start or goal
+  if (cell.classList.contains('start') || cell.classList.contains('goal')) return;
+  // Make cell an obstacle
+  if (cell.classList.contains('obstacle')) {
+    cell.classList.remove('obstacle');
     cell.classList.add('empty');
+  } else {
+    cell.classList.remove('empty');
+    cell.classList.add('obstacle');
   }
 }
 
@@ -209,34 +174,6 @@ function draggable(e) {
 }
 
 // Domain button event listeners
-document.getElementById('eraser').addEventListener('click', () => {
-  isEraser = true;
-  isObstacle = false;
-  isStart = false;
-  isGoal = false;
-})
-
-document.getElementById('obstacle').addEventListener('click', () => {
-  isEraser = false;
-  isObstacle = true;
-  isStart = false;
-  isGoal = false;
-})
-
-document.getElementById('start-position').addEventListener('click', () => {
-  isEraser = false;
-  isObstacle = false; 
-  isStart = true;
-  isGoal = false;
-})
-
-document.getElementById('goal-position').addEventListener('click', () => {
-  isEraser = false;
-  isObstacle = false;
-  isStart = false;
-  isGoal = true;
-})
-
 document.getElementById('reset').addEventListener('click', () => {
   const cells = document.getElementsByTagName('td');
   for (var i = 0; i < cells.length; i++) {
@@ -249,10 +186,18 @@ document.getElementById('reset').addEventListener('click', () => {
     cell.classList.remove('path');
     cell.classList.add('empty');
   }
-  goalCreated = false;
-  startCreated = false;
-  goalPosition = null;
-  startPosition = null;
+  const startCoors = `${Math.floor(y/2)},${Math.floor(x/4)}`;
+  const goalCoors = `${Math.floor(y/2)},${Math.floor(3*x/4)}`;
+  const start = document.getElementById(startCoors);
+  const goal = document.getElementById(goalCoors);
+  start.classList.remove('empty');
+  goal.classList.remove('empty');
+  start.classList.add('start');
+  goal.classList.add('goal');
+  startCreated = true;
+  goalCreated = true;
+  startPosition = startCoors;
+  goalPosition = goalCoors; 
 })
 
 document.getElementById('bfs').addEventListener('click', () => {
