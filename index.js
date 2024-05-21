@@ -78,12 +78,12 @@ function makeDomain() {
     for (var j = 0; j < x; j++) {
       var cell = document.createElement('td');
       cell.id = `${i},${j}`;
-      cell.addEventListener('click', e => clickable(e));
+      cell.addEventListener('mousedown', e => clickable(e));
       cell.addEventListener('mousemove', e => drawable(e));
       cell.addEventListener('mousedown', e => focus(e));
       cell.addEventListener('mouseup', e => focus(e));
       cell.addEventListener('mousemove', e => draggable(e))
-      cell.classList.add('empty');
+      cell.classList.add('unvisited');
       row.appendChild(cell);
     };
     table.appendChild(row);
@@ -106,22 +106,25 @@ function makeDomain() {
 }
 
 // User controls
+let previous = null;
 function clickable(e) {
+  e.preventDefault();
   const cell = e.target;
+  previous = cell;
   // Can't draw over start or goal
   if (cell.classList.contains('start') || cell.classList.contains('goal')) return;
   // Make cell an obstacle
   if (cell.classList.contains('obstacle')) {
     cell.classList.remove('obstacle');
-    cell.classList.add('empty');
+    cell.classList.add('unvisited');
   } else {
-    cell.classList.remove('empty');
+    cell.classList.remove('unvisited');
     cell.classList.add('obstacle');
   }
 }
 
-let previous = null;
 function drawable(e) {
+  e.preventDefault();
   if (!isMouseDown) return;
   if (previous == e.target) return;
   const cell = e.target;
@@ -131,9 +134,9 @@ function drawable(e) {
   // Make cell an obstacle
   if (cell.classList.contains('obstacle')) {
     cell.classList.remove('obstacle');
-    cell.classList.add('empty');
+    cell.classList.add('unvisited');
   } else {
-    cell.classList.remove('empty');
+    cell.classList.remove('unvisited');
     cell.classList.add('obstacle');
   }
 }
@@ -162,9 +165,9 @@ function draggable(e) {
   if (focusGoal) {
     if (cell.classList.contains('start')) return;
     const previousGoal = document.getElementById(goalPosition);
-    // Reset previous goal to empty
+    // Reset previous goal to unvisited
     previousGoal.classList.remove('goal');
-    previousGoal.classList.add('empty');
+    previousGoal.classList.add('unvisited');
     // Set new goal
     removeClasses(cell.id);
     cell.classList.add('goal');
@@ -173,9 +176,9 @@ function draggable(e) {
   else if (focusStart) {
     if (cell.classList.contains('goal')) return;
     const previousStart = document.getElementById(startPosition);
-    // Reset previous start to empty
+    // Reset previous start to unvisited
     previousStart.classList.remove('start');
-    previousStart.classList.add('empty');
+    previousStart.classList.add('unvisited');
     // Set new start
     removeClasses(cell.id);
     cell.classList.add('start');
@@ -188,26 +191,21 @@ document.getElementById('reset').addEventListener('click', () => {
   const cells = document.getElementsByTagName('td');
   for (var i = 0; i < cells.length; i++) {
     const cell = cells[i];
-    cell.classList.remove('obstacle');
-    cell.classList.remove('start');
-    cell.classList.remove('goal');
-    cell.classList.remove('guess');
-    cell.classList.remove('found');
-    cell.classList.remove('path');
-    cell.classList.add('empty');
+    removeClasses(cell.id);
+    cell.classList.add('unvisited');
   }
-  const startCoors = `${Math.floor(y/2)},${Math.floor(x/4)}`;
-  const goalCoors = `${Math.floor(y/2)},${Math.floor(3*x/4)}`;
-  const start = document.getElementById(startCoors);
-  const goal = document.getElementById(goalCoors);
-  start.classList.remove('empty');
-  goal.classList.remove('empty');
+  const startCoords = `${Math.floor(y/2)},${Math.floor(x/4)}`;
+  const goalCoords = `${Math.floor(y/2)},${Math.floor(3*x/4)}`;
+  const start = document.getElementById(startCoords);
+  const goal = document.getElementById(goalCoords);
+  start.classList.remove('unvisited');
+  goal.classList.remove('unvisited');
   start.classList.add('start');
   goal.classList.add('goal');
   startCreated = true;
   goalCreated = true;
-  startPosition = startCoors;
-  goalPosition = goalCoors; 
+  startPosition = startCoords;
+  goalPosition = goalCoords;
 })
 
 document.getElementById('bfs').addEventListener('click', () => {
@@ -219,62 +217,43 @@ document.getElementById('bfs').addEventListener('click', () => {
 // Algorithms
 // Breadth First Search
 async function bfs(startCoords, goalCoords) {
-  // Map of previous coords
+  // Map of coords: previous coords
   let cells = {};
   // Queue of string coords
   const q = new Queue();
-  // Set guess distance for start
+  // Initialize queue with start
   const start = document.getElementById(startCoords);
-  start.classList.add('guess');
+  start.classList.add('visited');
   cells[startCoords] = '0';
   q.enqueue(startCoords);
   while (!q.isEmpty) {
-    // Get string coords from queue
     const current = q.dequeue();
-    // Confirm shortest path
-    document.getElementById(current).classList.add('found');
-    // Get array coords from string coords
     const currentCoords = getNumberCoords(current);
-    // Get neighbor coords
     const neighbors = [
       [currentCoords[0] - 1, currentCoords[1]],
       [currentCoords[0] + 1, currentCoords[1]],
       [currentCoords[0], currentCoords[1] - 1],
       [currentCoords[0], currentCoords[1] + 1]
     ];
-    const stringNeighbors = [
-      getStringCoords(neighbors[0]),
-      getStringCoords(neighbors[1]),
-      getStringCoords(neighbors[2]),
-      getStringCoords(neighbors[3])
-    ]
     // Visit neighbors
     for (var i = 0; i < neighbors.length; i++) {
-      // Check if neighbor is in the domain
       if (!checkValid(neighbors[i])) continue;
-      // Get neighbor element
-      const neighbor = document.getElementById(getStringCoords(neighbors[i]));
-      // Check if neighbor's path has already been found
-      if (neighbor.classList.contains('found')) continue;
-      // Check if neighbor is already in the queue
-      if (neighbor.classList.contains('guess')) continue;
+      const neighborCoords = getStringCoords(neighbors[i]);
+      const neighbor = document.getElementById(neighborCoords);
+      if (neighbor.classList.contains('visited')) continue;
       // Check if neighbor is goal
-      if (stringNeighbors[i] === goalCoords) {
-        // Add previous coords
+      if (neighborCoords === goalCoords) {
         cells[goalCoords] = current;
-        // Display the shortest path
         displayPath(cells, startCoords, goalCoords);
-        // Update start styling
         removeClasses(startCoords);
         start.classList.add('start');
         return;
       }
-      // Add relevant class
-      neighbor.classList.add('guess');
-      // Add previous coords
-      cells[stringNeighbors[i]] = current;
-      // Add neighbor location to queue
-      q.enqueue(stringNeighbors[i]);
+      // Visit neighbor
+      neighbor.classList.remove('unvisited');
+      neighbor.classList.add('visited');
+      cells[neighborCoords] = current;
+      q.enqueue(neighborCoords);
     }
     await new Promise(resolve => setTimeout(resolve, 10));
   }
@@ -306,23 +285,25 @@ function removeClasses(id) {
   cell.classList.remove('obstacle');
   cell.classList.remove('goal');
   cell.classList.remove('start');
-  cell.classList.remove('empty');
-  cell.classList.remove('guess');
-  cell.classList.remove('found');
+  cell.classList.remove('visited');
+  cell.classList.remove('unvisited');
+  cell.classList.remove('path');
 }
 
 async function displayPath(cells, start, goal) {
-  let shortestPath = [];
+  // Get result path
+  let resultPath = [];
   let current = goal;
   while (current != '0') {
-    shortestPath.push(current);
+    resultPath.push(current);
     current = cells[current];
   }
   // Add path class to path
-  for (let i = shortestPath.length - 1; i >= 0; i--) {
-    if (shortestPath[i] == start) continue;
-    if (shortestPath[i] == goal) continue;
-    const cell = document.getElementById(shortestPath[i]);
+  for (let i = resultPath.length - 1; i >= 0; i--) {
+    if (resultPath[i] == start) continue;
+    if (resultPath[i] == goal) continue;
+    const cell = document.getElementById(resultPath[i]);
+    cell.classList.remove('visited');
     cell.classList.add('path');
     await new Promise(resolve => setTimeout(resolve, 10)); 
   }
