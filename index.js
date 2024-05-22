@@ -14,7 +14,7 @@ var goalCreated = false;
 var goalPosition = null;
 var startCreated = false;
 var startPosition = null;
-var pathFound = true;
+var pathFound = false;
 
 const headerHeight = document.getElementsByTagName('header')[0].clientHeight;
 const x = Math.round(document.getElementById('table-container').clientWidth / 25);
@@ -161,13 +161,13 @@ function focus(e) {
 }
 
 let previousPoint = null;
-let previousGoalType = null;
-let previousStartType = null;
+let previousGoalType = 'unvisited';
+let previousStartType = 'unvisited';
 function draggable(e) {
   e.preventDefault();
   if (!isMouseDown) return;
   if (!focusStart && !focusGoal) return;
-  if (previousPoint == e.target) return;
+  if (previousPoint === e.target) return;
 
   const cell = e.target;
   previousPoint = cell;
@@ -176,11 +176,10 @@ function draggable(e) {
     const previousGoal = document.getElementById(goalPosition);
     // Reset previous goal to unvisited
     previousGoal.classList.remove('goal');
-    if (previousGoalType === 'obstacle') {
-      previousGoal.classList.add('obstacle');
-    } else {
-      previousGoal.classList.add('unvisited');
-    }
+    if (previousGoalType === 'visited') 
+      previousGoal.classList.add('visited-instant');
+    else
+      previousGoal.classList.add(previousGoalType);
     previousGoalType = cell.classList[0];
     // Set new goal
     removeClasses(cell.id);
@@ -192,10 +191,10 @@ function draggable(e) {
     const previousStart = document.getElementById(startPosition);
     // Reset previous start to unvisited
     previousStart.classList.remove('start');
-    if (previousStartType === 'obstacle') {
-      previousStart.classList.add('obstacle');
+    if (previousStartType === 'visited') {
+      previousStart.classList.add('visited-instant');
     } else {
-      previousStart.classList.add('unvisited');
+      previousStart.classList.add(previousStartType);
     }
     previousStartType = cell.classList[0];
     // Set new start
@@ -203,16 +202,17 @@ function draggable(e) {
     cell.classList.add('start');
     startPosition = cell.id;
   }
+  if (pathFound) {
+      console.log('recalculating path');
+      // resetDomain();
+      resetVisited();
+      bfs(startPosition, goalPosition, 0);
+    }
 }
 
 // Domain button event listeners
 document.getElementById('reset').addEventListener('click', () => {
-  const cells = document.getElementsByTagName('td');
-  for (var i = 0; i < cells.length; i++) {
-    const cell = cells[i];
-    removeClasses(cell.id);
-    cell.classList.add('unvisited');
-  }
+  resetDomain();
   const startCoords = `${Math.floor(y/2)},${Math.floor(x/4)}`;
   const goalCoords = `${Math.floor(y/2)},${Math.floor(3*x/4)}`;
   const start = document.getElementById(startCoords);
@@ -225,6 +225,7 @@ document.getElementById('reset').addEventListener('click', () => {
   goalCreated = true;
   startPosition = startCoords;
   goalPosition = goalCoords;
+  pathFound = false;
 })
 
 document.getElementById('bfs').addEventListener('click', () => {
@@ -271,17 +272,16 @@ async function bfs(startCoords, goalCoords, delay) {
       }
       // Visit neighbor
       neighbor.classList.remove('unvisited');
-      if (!pathFound)
-        neighbor.classList.add('visited');
+      if (pathFound)
+          neighbor.classList.add('visited-instant');
       else
-        neighbor.classList.add('visited-instant');
+        neighbor.classList.add('visited');
       cells[neighborCoords] = current;
       q.enqueue(neighborCoords);
     }
     if (!pathFound)
       await new Promise(resolve => setTimeout(resolve, delay));
   }
-  alert('No path found');
 }
 
 // Helper functions
@@ -302,6 +302,25 @@ function checkValid(coords) {
   if (coords[1] < 0 || coords[1] >= x) return false;
   if (cell.classList.contains('obstacle')) return false;
   return true;
+}
+
+function resetDomain() {
+  const cells = document.getElementsByTagName('td');
+  for (var i = 0; i < cells.length; i++) {
+    const cell = cells[i];
+    removeClasses(cell.id);
+    cell.classList.add('unvisited');
+  }
+}
+
+function resetVisited() {
+  const cells = document.getElementsByTagName('td');
+  for (var i = 0; i < cells.length; i++) {
+    const cell = cells[i];
+    cell.classList.remove('visited');
+    cell.classList.remove('visited-instant');
+    cell.classList.remove('path');
+  }
 }
 
 function removeClasses(id) {
@@ -331,6 +350,6 @@ async function displayPath(cells, start, goal, delay) {
     cell.classList.remove('visited');
     cell.classList.add('path');
     if (!pathFound)
-      await new Promise(resolve => setTimeout(resolve, delay)); 
+      await new Promise(resolve => setTimeout(resolve, delay));
   }
 }
