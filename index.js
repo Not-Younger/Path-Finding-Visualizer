@@ -20,7 +20,7 @@ const headerHeight = document.getElementsByTagName('header')[0].clientHeight;
 const x = Math.round(document.getElementById('table-container').clientWidth / 25);
 const y = Math.round((document.getElementById('table-container').clientHeight - headerHeight) / 25);
 
-var algorithmSpeed = 10;
+var algorithmSpeed = 0;
 
 // Priority Queue
 class Queue {
@@ -226,6 +226,11 @@ document.getElementById('reset').addEventListener('click', () => {
   startPosition = startCoords;
   goalPosition = goalCoords;
   pathFound = false;
+
+  previous = null;
+  previousPoint = null;
+  previousGoalType = 'unvisited';
+  previousStartType = 'unvisited';
 })
 
 document.getElementById('bfs').addEventListener('click', () => {
