@@ -129,6 +129,7 @@ function drawable(e) {
   e.preventDefault();
   if (!isMouseDown) return;
   if (previous == e.target) return;
+  if (focusStart || focusGoal) return;
   const cell = e.target;
   previous = cell;
   // Can't draw over start or goal
@@ -159,18 +160,28 @@ function focus(e) {
   }
 }
 
-let previousCellType = null;
+let previousPoint = null;
+let previousGoalType = null;
+let previousStartType = null;
 function draggable(e) {
   e.preventDefault();
   if (!isMouseDown) return;
   if (!focusStart && !focusGoal) return;
+  if (previousPoint == e.target) return;
+
   const cell = e.target;
+  previousPoint = cell;
   if (focusGoal) {
     if (cell.classList.contains('start')) return;
     const previousGoal = document.getElementById(goalPosition);
     // Reset previous goal to unvisited
     previousGoal.classList.remove('goal');
-    previousGoal.classList.add('unvisited');
+    if (previousGoalType === 'obstacle') {
+      previousGoal.classList.add('obstacle');
+    } else {
+      previousGoal.classList.add('unvisited');
+    }
+    previousGoalType = cell.classList[0];
     // Set new goal
     removeClasses(cell.id);
     cell.classList.add('goal');
@@ -181,7 +192,12 @@ function draggable(e) {
     const previousStart = document.getElementById(startPosition);
     // Reset previous start to unvisited
     previousStart.classList.remove('start');
-    previousStart.classList.add('unvisited');
+    if (previousStartType === 'obstacle') {
+      previousStart.classList.add('obstacle');
+    } else {
+      previousStart.classList.add('unvisited');
+    }
+    previousStartType = cell.classList[0];
     // Set new start
     removeClasses(cell.id);
     cell.classList.add('start');
