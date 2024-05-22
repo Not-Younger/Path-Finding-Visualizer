@@ -20,6 +20,7 @@ const headerHeight = document.getElementsByTagName('header')[0].clientHeight;
 const x = Math.round(document.getElementById('table-container').clientWidth / 25);
 const y = Math.round((document.getElementById('table-container').clientHeight - headerHeight) / 25);
 
+var algorithmRunning = false;
 var algorithmSpeed = 0;
 
 // Priority Queue
@@ -168,6 +169,7 @@ function draggable(e) {
   if (!isMouseDown) return;
   if (!focusStart && !focusGoal) return;
   if (previousPoint === e.target) return;
+  if (algorithmRunning) return;
 
   const cell = e.target;
   previousPoint = cell;
@@ -242,6 +244,8 @@ document.getElementById('bfs').addEventListener('click', () => {
 // Algorithms
 // Breadth First Search
 async function bfs(startCoords, goalCoords, delay) {
+  if (algorithmRunning) return;
+  algorithmRunning = true;
   // Map of coords: previous coords
   let cells = {};
   // Queue of string coords
@@ -273,6 +277,7 @@ async function bfs(startCoords, goalCoords, delay) {
         pathFound = true;
         removeClasses(startCoords);
         start.classList.add('start');
+        algorithmRunning = false;
         return;
       }
       // Visit neighbor
