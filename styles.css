@@ -82,7 +82,7 @@ td {
 }
 
 .visited {
-  animation: fadeIn 1s ease-out;
+  animation: fadeIn 2s ease-out;
   background-color: rgba(0, 190, 218, 0.75);
 }
 

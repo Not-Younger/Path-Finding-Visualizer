@@ -120,7 +120,7 @@ function clickable(e) {
     cell.classList.remove('obstacle');
     cell.classList.add('unvisited');
   } else {
-    cell.classList.remove('unvisited');
+    removeClasses(cell.id);
     cell.classList.add('obstacle');
   }
 }
@@ -139,7 +139,7 @@ function drawable(e) {
     cell.classList.remove('obstacle');
     cell.classList.add('unvisited');
   } else {
-    cell.classList.remove('unvisited');
+    removeClasses(cell.id);
     cell.classList.add('obstacle');
   }
 }
