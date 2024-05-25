@@ -94,6 +94,10 @@ td {
   background-color: rgb(255, 254, 106);
 }
 
+.path-instant {
+  background-color: rgb(255, 254, 106);
+}
+
 .start {
   background-image: url("start.svg");
   background-position: center;

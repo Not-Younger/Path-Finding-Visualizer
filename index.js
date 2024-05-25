@@ -21,7 +21,7 @@ const x = Math.round(document.getElementById('table-container').clientWidth / 25
 const y = Math.round((document.getElementById('table-container').clientHeight - headerHeight) / 25);
 
 var algorithmRunning = false;
-var algorithmSpeed = 0;
+var algorithmSpeed = 10;
 
 // Priority Queue
 class Queue {
@@ -273,7 +273,10 @@ async function bfs(startCoords, goalCoords, delay) {
       // Check if neighbor is goal
       if (neighborCoords === goalCoords) {
         cells[goalCoords] = current;
-        displayPath(cells, startCoords, goalCoords, delay);
+        if (!pathFound)
+          displayPath(cells, startCoords, goalCoords, delay);
+        else
+          displayPath(cells, startCoords, goalCoords, 0);
         pathFound = true;
         removeClasses(startCoords);
         start.classList.add('start');
@@ -283,7 +286,7 @@ async function bfs(startCoords, goalCoords, delay) {
       // Visit neighbor
       neighbor.classList.remove('unvisited');
       if (pathFound)
-          neighbor.classList.add('visited-instant');
+        neighbor.classList.add('visited-instant');
       else
         neighbor.classList.add('visited');
       cells[neighborCoords] = current;
@@ -292,6 +295,9 @@ async function bfs(startCoords, goalCoords, delay) {
     if (!pathFound)
       await new Promise(resolve => setTimeout(resolve, delay));
   }
+  removeClasses(startCoords);
+  start.classList.add('start');
+  algorithmRunning = false;
 }
 
 // Helper functions
@@ -330,6 +336,7 @@ function resetVisited() {
     cell.classList.remove('visited');
     cell.classList.remove('visited-instant');
     cell.classList.remove('path');
+    cell.classList.remove('path-instant');
   }
 }
 
@@ -342,6 +349,7 @@ function removeClasses(id) {
   cell.classList.remove('visited-instant');
   cell.classList.remove('unvisited');
   cell.classList.remove('path');
+  cell.classList.remove('path-instant');
 }
 
 async function displayPath(cells, start, goal, delay) {
@@ -358,8 +366,13 @@ async function displayPath(cells, start, goal, delay) {
     if (resultPath[i] == goal) continue;
     const cell = document.getElementById(resultPath[i]);
     cell.classList.remove('visited');
-    cell.classList.add('path');
-    if (!pathFound)
+    cell.classList.remove('visited-instant');
+    if (delay != 0) {
+      cell.classList.add('path');
       await new Promise(resolve => setTimeout(resolve, delay));
+    }
+    else {
+      cell.classList.add('path-instant');
+    }
   }
 }
