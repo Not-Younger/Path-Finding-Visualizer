@@ -51,6 +51,51 @@ button:active {
   transform: translateY(2px);;
 }
 
+#info {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.label {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.label img {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.label p {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.color {
+  height: 1.5rem;
+  width: 1.5rem;
+  border: 1px solid var(--main-grid-color);
+}
+
+#unvisited-label {
+  background-color: rgb(255, 255, 255);
+}
+
+#visited-label {
+  background-color: rgba(0, 190, 218, 0.75);
+}
+
+#shortest-path-label {
+  background-color: rgb(255, 254, 106);
+}
+
+#obstacle-label {
+  background-color: rgb(52, 73, 94);
+}
+
 #table-container {
   flex: auto;
 }
