@@ -172,7 +172,6 @@ function draggable(e) {
   if (algorithmRunning) return;
 
   const cell = e.target;
-  previousPoint = cell;
   if (focusGoal) {
     if (cell.classList.contains('start')) return;
     const previousGoal = document.getElementById(goalPosition);
@@ -209,7 +208,8 @@ function draggable(e) {
       // resetDomain();
       resetVisited();
       bfs(startPosition, goalPosition, 0);
-    }
+  }
+  previousPoint = cell;
 }
 
 // Domain button event listeners
@@ -333,10 +333,14 @@ function resetVisited() {
   const cells = document.getElementsByTagName('td');
   for (var i = 0; i < cells.length; i++) {
     const cell = cells[i];
+    if (cell.classList.contains('obstacle')) continue;
+    if (cell.classList.contains('goal')) continue;
+    if (cell.classList.contains('start')) continue;
     cell.classList.remove('visited');
     cell.classList.remove('visited-instant');
     cell.classList.remove('path');
     cell.classList.remove('path-instant');
+    cell.classList.add('unvisited');
   }
 }
 
