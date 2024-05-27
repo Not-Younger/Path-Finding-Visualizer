@@ -12,6 +12,7 @@ html {
   color: var(--main-color);
   height: 100%;
   margin: 0;
+  font-family: 'Roboto', sans-serif;
 }
 
 html.dark-theme {
@@ -19,7 +20,6 @@ html.dark-theme {
   --main-color: rgb(255, 255, 255);
   --main-grid-color: rgb(255, 255, 255);
   --main-highlight-color: rgb(95, 144, 229);
-  
 }
 
 body {
@@ -29,6 +29,8 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+/* Header */
 
 header {
   display: flex;
@@ -51,32 +53,22 @@ h1 {
 
 #contact, #mode {
   background-color: rgb(255, 127, 80);
-}
-
-button {
-  background-color: var(--main-button-color);
   color: var(--secondary-color);
-  border: none;
   font-size: 1rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 5px;
-  cursor: pointer;
   transition: transform 0.1s ease;
+  border: none;
+  border-radius: 5px;
+  padding: 0.75rem 1rem;
 }
 
-a {
-  color: var(--secondary-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-button:active {
+#contact:active, #mode:active, .push-button:active {
   transform: translateY(2px);
 }
 
+/* Controls */
+
 section {
-  padding: 1rem;
+  padding: 1rem 1rem 0 1rem;
   display: flex;
   justify-content: center;
   gap: 2rem;
@@ -85,7 +77,109 @@ section {
 
 #controls {
   background-color: var(--main-highlight-color);
+  padding: 0;
 }
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.control {
+  display: inline-block;
+  padding: 0 1rem;
+  margin: 0;
+  position: relative;
+  min-width: max-content;
+}
+
+.dropdown-button, .push-button {
+  font-size: 1.25rem;
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.dropdown-button {
+  transition: color 0.3s ease;
+  padding-bottom: 1.5rem;
+}
+
+.closed {
+  background-color: var(--main-background-color);
+}
+
+.closed:hover, .hover-button:hover {
+  color: var(--main-button-color);
+}
+
+.open {
+  background-color: var(--main-button-color);
+}
+
+.push-button {
+  background-color: var(--main-button-color);
+  border-radius: 5px;
+}
+
+.hover-button {
+  background-color: var(--main-highlight-color);
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 1.25rem;
+  transition: color 0.3s ease;
+  padding: 0.75rem 1rem;
+}
+
+#algorithms-container {
+  display: none;
+}
+
+#mazes-container {
+  display: none;
+}
+
+#speeds-container {
+  display: none;
+}
+
+.dropdown-container {
+  z-index: 1;
+  position: absolute;
+  background-color: var(--main-highlight-color);
+  color: white;
+  padding: 0.3rem 0.3rem;
+  border-radius: 5px;
+  margin-top: 0.5rem;
+  min-width: 100%;
+}
+
+.dropdown-container li {
+  cursor: pointer;
+  min-width: max-content;
+}
+
+.dropdown-choice {
+  background-color: var(--main-background-color);
+  padding: 0.5rem 0.5rem;
+  color: white;
+  border-radius: 5px;
+  border: none;
+  width: 100%;
+  text-align: left;
+  transition: background-color 0.3s ease;
+}
+.dropdown-choice:hover {
+  background-color: var(--main-button-color);
+}
+
 
 .label {
   display: flex;
@@ -109,6 +203,8 @@ section {
   border: 1px solid var(--main-grid-color);
 }
 
+/* Labels */
+
 #unvisited-label {
   background-color: rgb(255, 255, 255);
 }
@@ -128,6 +224,8 @@ section {
 #table-container {
   flex: auto;
 }
+
+/* Grid */
 
 table {
   border: 1px solid black;

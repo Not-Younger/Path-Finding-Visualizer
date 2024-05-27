@@ -213,6 +213,79 @@ function draggable(e) {
 }
 
 // Domain button event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  const algoBtn = document.getElementById('algorithm');
+  const mazeBtn = document.getElementById('maze');
+  const speedBtn = document.getElementById('speed');
+  algoBtn.addEventListener('click', function() {
+    this.classList.toggle('closed');
+    this.classList.toggle('open');
+    mazeBtn.classList.add('closed');
+    mazeBtn.classList.remove('open');
+    speedBtn.classList.add('closed');
+    speedBtn.classList.remove('open');
+    if (this.classList.contains('open')) {
+      document.getElementById('algorithms-container').style.display = 'block';
+      algoBtn.innerHTML = 'Algorithms <i class="icon fa-solid fa-caret-down" style="transform: rotate(180deg)"></i>';
+    }
+    else {
+      document.getElementById('algorithms-container').style.display = 'none';
+      algoBtn.innerHTML = 'Algorithms <i class="icon fa-solid fa-caret-down"></i>';
+    }
+    document.getElementById('mazes-container').style.display = 'none';
+    document.getElementById('speeds-container').style.display = 'none';
+  });
+  mazeBtn.addEventListener('click', function() {
+    algoBtn.classList.add('closed');
+    algoBtn.classList.remove('open');  
+    this.classList.toggle('closed');
+    this.classList.toggle('open');
+    speedBtn.classList.add('closed');
+    speedBtn.classList.remove('open');
+    if (this.classList.contains('open')) {
+      document.getElementById('mazes-container').style.display = 'block';
+      mazeBtn.innerHTML = 'Mazes & Patterns <i class="icon fa-solid fa-caret-down" style="transform: rotate(180deg)"></i>';
+    }
+    else {
+      document.getElementById('mazes-container').style.display = 'none';
+      mazeBtn.innerHTML = 'Mazes & Patterns <i class="icon fa-solid fa-caret-down"></i>';
+    }
+    document.getElementById('algorithms-container').style.display = 'none';
+    document.getElementById('speeds-container').style.display = 'none';
+  });
+  speedBtn.addEventListener('click', function() {
+    algoBtn.classList.add('closed');
+    algoBtn.classList.remove('open');  
+    mazeBtn.classList.add('closed');
+    mazeBtn.classList.remove('open');
+    this.classList.toggle('closed');
+    this.classList.toggle('open');
+    if (this.classList.contains('open')) {
+      document.getElementById('speeds-container').style.display = 'block';
+      speedBtn.innerHTML = 'Speed <i class="icon fa-solid fa-caret-down" style="transform: rotate(180deg)"></i>';
+    }
+    else {
+      document.getElementById('speeds-container').style.display = 'none';
+      speedBtn.innerHTML = 'Speed <i class="icon fa-solid fa-caret-down"></i>';
+    }
+    document.getElementById('algorithms-container').style.display = 'none';
+    document.getElementById('mazes-container').style.display = 'none';
+  });
+  document.addEventListener('mousedown', (e) => {
+    if (e.target == algoBtn || e.target == mazeBtn || e.target == speedBtn) return;
+    if (e.target.classList.contains('icon')) return;
+    algoBtn.classList.add('closed');
+    algoBtn.classList.remove('open');
+    mazeBtn.classList.add('closed');
+    mazeBtn.classList.remove('open');
+    speedBtn.classList.add('closed');
+    speedBtn.classList.remove('open');
+    document.getElementById('algorithms-container').style.display = 'none';
+    document.getElementById('mazes-container').style.display = 'none';
+    document.getElementById('speeds-container').style.display = 'none';
+  })
+});
+
 document.getElementById('reset').addEventListener('click', () => {
   resetDomain();
   const startCoords = `${Math.floor(y/2)},${Math.floor(x/4)}`;
@@ -235,7 +308,7 @@ document.getElementById('reset').addEventListener('click', () => {
   previousStartType = 'unvisited';
 })
 
-document.getElementById('bfs').addEventListener('click', () => {
+document.getElementById('start').addEventListener('click', () => {
   // Check if start and goal exist
   if (startPosition == null || goalPosition == null) return;
   bfs(startPosition, goalPosition, algorithmSpeed);
@@ -380,3 +453,4 @@ async function displayPath(cells, start, goal, delay) {
     }
   }
 }
+

@@ -1,24 +1,63 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <title>Pathfinding Visualizer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="styles.css">
   </head>
   <body>
     <header>
       <h1>Path Visualizer</h1>
       <div>
-        <button id="mode" onclick="toggleDarkMode()">Mode</button>
+        <button id="mode" class="push-button" onclick="toggleDarkMode()">Mode</button>
         <a href="mailto:jonathanyoung7718@gmail.com" style="text-decoration: none;">
-          <button id="contact">Contact Me</button>
+          <button id="contact" class="push-button">Contact Me</button>
         </a>
       </div>
     </header>
 
     <section id="controls">
-      <button id="reset">Reset</button>
-      <button id="bfs">BFS</button>
+      <ul id="controls-container">
+        <li class="control">
+          <button id="algorithm" class="dropdown-button closed">Algorithms<i class="icon fa-solid fa-caret-down"></i></button>
+          <ul id="algorithms-container" class="dropdown-container">
+            <li><button id="bfs" class="dropdown-choice">Breadth-first Search</button></li>
+            <li><button id="dfs" class="dropdown-choice">Depth-first Search</button></li>
+            <li><button id="dijkstra" class="dropdown-choice">Dijkstra's Algorithm</button></li>
+            <li><button id="a*" class="dropdown-choice">A* Search</button></li>
+          </ul>
+        </li>
+        <li class="control">
+          <button id="maze" class="dropdown-button closed">Mazes & Patterns<i class="icon fa-solid fa-caret-down"></i></button>
+          <ul id="mazes-container" class="dropdown-container">
+            <li><button id="rec-div" class="dropdown-choice">Recursive Division</button></li>
+            <li><button id="rec-div-v" class="dropdown-choice">Recursive Division (vertical skew)</button></li>
+            <li><button id="rec-div-h" class="dropdown-choice">Recursive Division (horizontal skew)</button></li>
+            <li><button id="random" class="dropdown-choice">Basic Random Maze</button></li>
+            <li><button id="basic" class="dropdown-choice">Basic Weight Maze</button></li>
+            <li><button id="simple" class="dropdown-choice">Simple Stair Pattern</button></li>
+          </ul> 
+        </li>
+        <li class="control">
+          <button id="start" class="push-button">Start</button>
+        </li>
+        <li class="control">
+          <button id="reset" class="hover-button">Clear Board</button>
+        </li>
+        <li class="control">
+          <button id="clear" class="hover-button">Clear Walls & Weights</button>
+        </li>
+        <li class="control">
+          <button id="speed" class="dropdown-button closed">Speed<i class="icon fa-solid fa-caret-down"></i></button>
+          <ul id="speeds-container" class="dropdown-container">
+            <li><button id="fast" class="dropdown-choice">Fast</button></li>
+            <li><button id="average" class="dropdown-choice">Average</button></li>
+            <li><button id="slow" class="dropdown-choice">Slow</button></li>
+          </ul> 
+        </li>
+      </ul>
     </section>
 
     <section id="info">
@@ -52,5 +91,6 @@
     </div>
     
     <script src="./index.js"></script>
+    <script src="https://kit.fontawesome.com/0497e2ca9a.js" crossorigin="anonymous"></script>
   </body>
   </html>
