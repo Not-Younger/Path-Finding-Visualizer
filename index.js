@@ -14,7 +14,7 @@ var goalCreated = false;
 var goalPosition = null;
 var startCreated = false;
 var startPosition = null;
-var pathFound = false;
+var pathChecked = false;
 
 const headerHeight = document.getElementsByTagName('header')[0].clientHeight;
 const x = Math.round(document.getElementById('table-container').clientWidth / 25);
@@ -203,9 +203,7 @@ function draggable(e) {
     cell.classList.add('start');
     startPosition = cell.id;
   }
-  if (pathFound) {
-      console.log('recalculating path');
-      // resetDomain();
+  if (pathChecked) {
       resetVisited();
       bfs(startPosition, goalPosition, 0);
   }
@@ -300,7 +298,7 @@ document.getElementById('reset').addEventListener('click', () => {
   goalCreated = true;
   startPosition = startCoords;
   goalPosition = goalCoords;
-  pathFound = false;
+  pathChecked = false;
 
   previous = null;
   previousPoint = null;
@@ -346,11 +344,11 @@ async function bfs(startCoords, goalCoords, delay) {
       // Check if neighbor is goal
       if (neighborCoords === goalCoords) {
         cells[goalCoords] = current;
-        if (!pathFound)
+        if (!pathChecked)
           displayPath(cells, startCoords, goalCoords, delay);
         else
           displayPath(cells, startCoords, goalCoords, 0);
-        pathFound = true;
+        pathChecked = true;
         removeClasses(startCoords);
         start.classList.add('start');
         algorithmRunning = false;
@@ -358,19 +356,20 @@ async function bfs(startCoords, goalCoords, delay) {
       }
       // Visit neighbor
       neighbor.classList.remove('unvisited');
-      if (pathFound)
+      if (pathChecked)
         neighbor.classList.add('visited-instant');
       else
         neighbor.classList.add('visited');
       cells[neighborCoords] = current;
       q.enqueue(neighborCoords);
     }
-    if (!pathFound)
+    if (!pathChecked)
       await new Promise(resolve => setTimeout(resolve, delay));
   }
   removeClasses(startCoords);
   start.classList.add('start');
   algorithmRunning = false;
+  pathChecked = true;
 }
 
 // Helper functions
