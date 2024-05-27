@@ -114,10 +114,15 @@ function clickable(e) {
   e.preventDefault();
   const cell = e.target;
   previous = cell;
-  // Can't draw over start or goal
-  if (cell.classList.contains('start') || cell.classList.contains('goal')) return;
+  // Can't draw over start or goal, but can recompute path on click
+  if (cell.classList.contains('start') || cell.classList.contains('goal')) {
+    if (pathChecked) {
+      resetVisited();
+      bfs(startPosition, goalPosition, 0);
+    }
+  }
   // Make cell an obstacle
-  if (cell.classList.contains('obstacle')) {
+  else if (cell.classList.contains('obstacle')) {
     cell.classList.remove('obstacle');
     cell.classList.add('unvisited');
   } else {
