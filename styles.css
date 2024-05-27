@@ -1,7 +1,10 @@
 :root {
   --main-bg-color: rgb(255, 255, 255);
   --main-color: rgb(0, 0, 0);
+  --secondary-color: rgb(255, 255, 255);
   --main-grid-color: rgb(175, 216, 248);
+  --main-highlight-color: rgb(52, 73, 94);
+  --main-button-color: rgb(26, 188, 156);
 }
 
 html {
@@ -9,12 +12,14 @@ html {
   color: var(--main-color);
   height: 100%;
   margin: 0;
+  font-family: 'Roboto', sans-serif;
 }
 
 html.dark-theme {
   --main-bg-color: black;
   --main-color: rgb(255, 255, 255);
   --main-grid-color: rgb(255, 255, 255);
+  --main-highlight-color: rgb(95, 144, 229);
 }
 
 body {
@@ -25,35 +30,202 @@ body {
   flex-direction: column;
 }
 
+/* Header */
+
 header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   gap: 1rem;
   flex: none;
   padding: 1rem;
+  background-color: var(--main-highlight-color);
+}
+
+header div {
+  display: flex;
+  gap: 1rem;
 }
 
 h1 {
+  color: var(--secondary-color);
   margin: 0;
 }
 
-button {
-  background-color: var(--main-bg-color);
-  color: var(--main-color);
-  border: 1px solid var(--main-color);
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  cursor: pointer;
+#contact, #mode {
+  background-color: rgb(255, 127, 80);
+  color: var(--secondary-color);
+  font-size: 1rem;
   transition: transform 0.1s ease;
+  border: none;
+  border-radius: 5px;
+  padding: 0.75rem 1rem;
 }
 
-button:active {
-  transform: translateY(2px);;
+#contact:active, #mode:active, .push-button:active {
+  transform: translateY(2px);
+}
+
+/* Controls */
+
+section {
+  padding: 1rem 1rem 0 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+#controls {
+  background-color: var(--main-highlight-color);
+  padding: 0;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.control {
+  display: inline-block;
+  padding: 0 1rem;
+  margin: 0;
+  position: relative;
+  min-width: max-content;
+}
+
+.dropdown-button, .push-button {
+  font-size: 1.25rem;
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.dropdown-button {
+  transition: color 0.3s ease;
+  padding-bottom: 1.5rem;
+}
+
+.closed {
+  background-color: var(--main-background-color);
+}
+
+.closed:hover, .hover-button:hover {
+  color: var(--main-button-color);
+}
+
+.open {
+  background-color: var(--main-button-color);
+}
+
+.push-button {
+  background-color: var(--main-button-color);
+  border-radius: 5px;
+}
+
+.hover-button {
+  background-color: var(--main-highlight-color);
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 1.25rem;
+  transition: color 0.3s ease;
+  padding: 0.75rem 1rem;
+}
+
+#algorithms-container {
+  display: none;
+}
+
+#mazes-container {
+  display: none;
+}
+
+#speeds-container {
+  display: none;
+}
+
+.dropdown-container {
+  z-index: 1;
+  position: absolute;
+  background-color: var(--main-highlight-color);
+  color: white;
+  padding: 0.3rem 0.3rem;
+  border-radius: 5px;
+  margin-top: 0.5rem;
+  min-width: 100%;
+}
+
+.dropdown-container li {
+  cursor: pointer;
+  min-width: max-content;
+}
+
+.dropdown-choice {
+  background-color: var(--main-background-color);
+  padding: 0.5rem 0.5rem;
+  color: white;
+  border-radius: 5px;
+  border: none;
+  width: 100%;
+  text-align: left;
+  transition: background-color 0.3s ease;
+}
+.dropdown-choice:hover {
+  background-color: var(--main-button-color);
+}
+
+
+.label {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.label img {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.label p {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.color {
+  height: 1.5rem;
+  width: 1.5rem;
+  border: 1px solid var(--main-grid-color);
+}
+
+/* Labels */
+
+#unvisited-label {
+  background-color: rgb(255, 255, 255);
+}
+
+#visited-label {
+  background-color: rgb(0, 190, 218, 0.75);
+}
+
+#shortest-path-label {
+  background-color: rgb(255, 254, 106);
+}
+
+#obstacle-label {
+  background-color: rgb(52, 73, 94);
 }
 
 #table-container {
   flex: auto;
 }
+
+/* Grid */
 
 table {
   border: 1px solid black;
@@ -131,7 +303,7 @@ td {
 
 @keyframes placeIn {
   0% {
-    transform: scale(0);
+    transform: scale(1);
   }
   50% {
     transform: scale(1.3);
