@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('algorithms-container').style.display = 'none';
     document.getElementById('mazes-container').style.display = 'none';
   });
-  document.addEventListener('mousedown', (e) => {
+  document.addEventListener('click', (e) => {
     if (e.target == algoBtn || e.target == mazeBtn || e.target == speedBtn) return;
     if (e.target.classList.contains('icon')) return;
     algoBtn.classList.add('closed');
@@ -335,6 +335,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('speeds-container').style.display = 'none';
   })
 });
+
+document.getElementById('bfs').addEventListener('click', () => {
+  algorithm = bfs;
+})
+
+document.getElementById('dfs').addEventListener('click', () => {
+  algorithm = dfs;
+})
 
 document.getElementById('reset').addEventListener('click', () => {
   resetDomain();
