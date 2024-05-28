@@ -20,10 +20,15 @@ const headerHeight = document.getElementsByTagName('header')[0].clientHeight;
 const x = Math.round(document.getElementById('table-container').clientWidth / 25);
 const y = Math.round((document.getElementById('table-container').clientHeight - headerHeight) / 25);
 
+var algorithm = bfs;
 var algorithmRunning = false;
 var algorithmSpeed = 10;
 
-// Priority Queue
+function callAlgorithm(algo, delay=0) {
+  algo(startPosition, goalPosition, delay);
+}
+
+// Queue
 class Queue {
   constructor() {
     this.elements = {};
@@ -48,6 +53,46 @@ class Queue {
   }
   get isEmpty() {
     return this.length === 0;
+  }
+}
+
+// Stack
+class Stack {
+  constructor(size) {
+    this._size = size
+    this._stack = []
+  }
+  isFull() {
+    return (this._stack.length === this._size)
+  }
+  isEmpty() {
+    return (this._stack.length === 0)
+  }
+  push(item) {
+    if (!this.isFull()) {
+      this._stack.push(item)
+      return true
+    }
+    return false
+  }
+  pop() {
+    if (!this.isEmpty()) {
+      const index = this._stack.indexOf(this._stack[this._stack.length - 1])
+      if (index > -1) {
+        this._stack.splice(index, 1)
+      }
+      return true
+    }
+    return false
+  }
+  peek() {
+    if (!this.isEmpty()) {
+      return this._stack[this._stack.length - 1]
+    }
+    return 'empty'
+  }
+  getStack() {
+    return this._stack
   }
 }
 
@@ -80,7 +125,7 @@ function makeDomain() {
     var row = document.createElement('tr');
     for (var j = 0; j < x; j++) {
       var cell = document.createElement('td');
-      cell.id = `${i},${j}`;
+      cell.id = `${j},${i}`;
       cell.addEventListener('mousedown', e => clickable(e));
       cell.addEventListener('mousemove', e => drawable(e));
       cell.addEventListener('mousedown', e => focus(e));
@@ -94,18 +139,18 @@ function makeDomain() {
   container.appendChild(table);
 
   // Add start and goal positions
-  const startCoors = `${Math.floor(y/2)},${Math.floor(x/4)}`;
-  const goalCoors = `${Math.floor(y/2)},${Math.floor(3*x/4)}`;
-  const start = document.getElementById(startCoors);
-  const goal = document.getElementById(goalCoors);
+  const startCoords = `${Math.floor(x/4)},${Math.floor(y/2)}`;
+  const goalCoords = `${Math.floor(3*x/4)},${Math.floor(y/2)}`;
+  const start = document.getElementById(startCoords);
+  const goal = document.getElementById(goalCoords);
   start.classList.remove('unvisited');
   goal.classList.remove('unvisited');
   start.classList.add('start');
   goal.classList.add('goal');
   startCreated = true;
   goalCreated = true;
-  startPosition = startCoors;
-  goalPosition = goalCoors;
+  startPosition = startCoords;
+  goalPosition = goalCoords;
 }
 
 // User controls
@@ -115,10 +160,10 @@ function clickable(e) {
   const cell = e.target;
   previous = cell;
   // Can't draw over start or goal, but can recompute path on click
-  if (cell.classList.contains('start') || cell.classList.contains('goal')) {
+  if (cell.classList.contains('start') || cell.classList.contains('goal') || cell.classList.contains('start-after') || cell.classList.contains('goal-after')) {
     if (pathChecked) {
       resetVisited();
-      bfs(startPosition, goalPosition, 0);
+      callAlgorithm(algorithm);
     }
   }
   // Make cell an obstacle
@@ -178,10 +223,11 @@ function draggable(e) {
 
   const cell = e.target;
   if (focusGoal) {
-    if (cell.classList.contains('start')) return;
+    if (cell.classList.contains('start') || cell.classList.contains('start-after')) return;
     const previousGoal = document.getElementById(goalPosition);
     // Reset previous goal to unvisited
     previousGoal.classList.remove('goal');
+    previousGoal.classList.remove('goal-after');
     if (previousGoalType === 'visited') 
       previousGoal.classList.add('visited-instant');
     else
@@ -193,10 +239,11 @@ function draggable(e) {
     goalPosition = cell.id;
   }
   else if (focusStart) {
-    if (cell.classList.contains('goal')) return;
+    if (cell.classList.contains('goal') || cell.classList.contains('goal-after')) return;
     const previousStart = document.getElementById(startPosition);
     // Reset previous start to unvisited
     previousStart.classList.remove('start');
+    previousStart.classList.remove('start-after');
     if (previousStartType === 'visited') {
       previousStart.classList.add('visited-instant');
     } else {
@@ -209,8 +256,8 @@ function draggable(e) {
     startPosition = cell.id;
   }
   if (pathChecked) {
-      resetVisited();
-      bfs(startPosition, goalPosition, 0);
+    resetVisited();
+    callAlgorithm(algorithm);
   }
   previousPoint = cell;
 }
@@ -291,8 +338,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.getElementById('reset').addEventListener('click', () => {
   resetDomain();
-  const startCoords = `${Math.floor(y/2)},${Math.floor(x/4)}`;
-  const goalCoords = `${Math.floor(y/2)},${Math.floor(3*x/4)}`;
+  const startCoords = `${Math.floor(x/4)},${Math.floor(y/2)}`;
+  const goalCoords = `${Math.floor(3*x/4)},${Math.floor(y/2)}`;
   const start = document.getElementById(startCoords);
   const goal = document.getElementById(goalCoords);
   start.classList.remove('unvisited');
@@ -314,7 +361,7 @@ document.getElementById('reset').addEventListener('click', () => {
 document.getElementById('start').addEventListener('click', () => {
   // Check if start and goal exist
   if (startPosition == null || goalPosition == null) return;
-  bfs(startPosition, goalPosition, algorithmSpeed);
+  callAlgorithm(algorithm, algorithmSpeed);
 })
 
 // Algorithms
@@ -335,10 +382,10 @@ async function bfs(startCoords, goalCoords, delay) {
     const current = q.dequeue();
     const currentCoords = getNumberCoords(current);
     const neighbors = [
-      [currentCoords[0] - 1, currentCoords[1]],
+      [currentCoords[0], currentCoords[1] + 1],
       [currentCoords[0] + 1, currentCoords[1]],
       [currentCoords[0], currentCoords[1] - 1],
-      [currentCoords[0], currentCoords[1] + 1]
+      [currentCoords[0] - 1, currentCoords[1]],
     ];
     // Visit neighbors
     for (var i = 0; i < neighbors.length; i++) {
@@ -353,9 +400,9 @@ async function bfs(startCoords, goalCoords, delay) {
           displayPath(cells, startCoords, goalCoords, delay);
         else
           displayPath(cells, startCoords, goalCoords, 0);
+        start.classList.remove('visited');
+        start.classList.remove('visited-instant');
         pathChecked = true;
-        removeClasses(startCoords);
-        start.classList.add('start');
         algorithmRunning = false;
         return;
       }
@@ -367,14 +414,74 @@ async function bfs(startCoords, goalCoords, delay) {
         neighbor.classList.add('visited');
       cells[neighborCoords] = current;
       q.enqueue(neighborCoords);
+      if (!pathChecked)
+        await new Promise(resolve => setTimeout(resolve, delay));
     }
-    if (!pathChecked)
-      await new Promise(resolve => setTimeout(resolve, delay));
   }
-  removeClasses(startCoords);
-  start.classList.add('start');
+  start.classList.remove('visited');
+  start.classList.remove('visited-instant');
   algorithmRunning = false;
   pathChecked = true;
+}
+
+async function dfs(startCoords, goalCoords, delay) {
+  if (algorithmRunning) return;
+  algorithmRunning = true;
+  // Map of coords: previous coords
+  let cells = {};
+  // Stack of string coords
+  const s = new Stack(x * y);
+  // Initialize queue with start
+  const start = document.getElementById(startCoords);
+  // start.classList.add('visited');
+  cells[startCoords] = '0';
+  s.push(startCoords);
+  while (!s.isEmpty()) {
+    const currentStringCoords = s.peek();
+    s.pop();
+    // Visit current
+    const current = document.getElementById(currentStringCoords);
+    current.classList.remove('unvisited');
+    if (pathChecked)
+      current.classList.add('visited-instant');
+    else
+      current.classList.add('visited');
+    // Check if current is goal
+    if (currentStringCoords === goalCoords) {
+      if (!pathChecked)
+        displayPath(cells, startCoords, goalCoords, delay);
+      else
+        displayPath(cells, startCoords, goalCoords, 0);
+      start.classList.remove('visited');
+      start.classList.remove('visited-instant');
+      pathChecked = true;
+      algorithmRunning = false;
+      return;
+    }
+    // Get current number coords and find neighbors
+    const currentCoords = getNumberCoords(currentStringCoords);
+    const neighbors = [
+      [currentCoords[0] - 1, currentCoords[1]],
+      [currentCoords[0], currentCoords[1] - 1],
+      [currentCoords[0] + 1, currentCoords[1]],
+      [currentCoords[0], currentCoords[1] + 1],
+    ];
+    // Add neighbors
+    for (var i = 0; i < neighbors.length; i++) {
+      if (!checkValid(neighbors[i])) continue;
+      const neighborStringCoords = getStringCoords(neighbors[i]);
+      const neighbor = document.getElementById(neighborStringCoords);
+      if (neighbor.classList.contains('visited') || neighbor.classList.contains('visited-instant')) continue;
+      s.push(neighborStringCoords);
+      cells[neighborStringCoords] = currentStringCoords;
+      if (!pathChecked)
+        await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  start.classList.remove('visited');
+  start.classList.remove('visited-instant');
+  pathChecked = true;
+  algorithmRunning = false;
 }
 
 // Helper functions
@@ -391,8 +498,8 @@ function getStringCoords(coords) {
 
 function checkValid(coords) {
   const cell = document.getElementById(getStringCoords(coords));
-  if (coords[0] < 0 || coords[0] >= y) return false;
-  if (coords[1] < 0 || coords[1] >= x) return false;
+  if (coords[0] < 0 || coords[0] >= x) return false;
+  if (coords[1] < 0 || coords[1] >= y) return false;
   if (cell.classList.contains('obstacle')) return false;
   return true;
 }
@@ -413,11 +520,16 @@ function resetVisited() {
     if (cell.classList.contains('obstacle')) continue;
     if (cell.classList.contains('goal')) continue;
     if (cell.classList.contains('start')) continue;
-    cell.classList.remove('visited');
-    cell.classList.remove('visited-instant');
-    cell.classList.remove('path');
-    cell.classList.remove('path-instant');
-    cell.classList.add('unvisited');
+    if (cell.classList.contains('goal-after')) {
+      removeClasses(cell.id);
+      cell.classList.add('goal');
+    } else if (cell.classList.contains('start-after')) {
+      removeClasses(cell.id);
+      cell.classList.add('start');
+    } else {
+      removeClasses(cell.id);
+      cell.classList.add('unvisited');
+    }
   }
 }
 
@@ -431,6 +543,8 @@ function removeClasses(id) {
   cell.classList.remove('unvisited');
   cell.classList.remove('path');
   cell.classList.remove('path-instant');
+  cell.classList.remove('start-after');
+  cell.classList.remove('goal-after');
 }
 
 async function displayPath(cells, start, goal, delay) {
@@ -441,6 +555,8 @@ async function displayPath(cells, start, goal, delay) {
     resultPath.push(current);
     current = cells[current];
   }
+  document.getElementById(start).classList.remove('start');
+  document.getElementById(start).classList.add('start-after');
   // Add path class to path
   for (let i = resultPath.length - 1; i >= 0; i--) {
     if (resultPath[i] == start) continue;
@@ -456,5 +572,7 @@ async function displayPath(cells, start, goal, delay) {
       cell.classList.add('path-instant');
     }
   }
+  document.getElementById(goal).classList.remove('goal');
+  document.getElementById(goal).classList.add('goal-after');
 }
 
