@@ -112,10 +112,10 @@ function toggleDarkMode() {
 // Global event listeners
 document.addEventListener('mousedown', () => {
   isMouseDown = true;
-})
+});
 document.addEventListener('mouseup', () => {
   isMouseDown = false;
-})
+});
 
 // Make domain
 function makeDomain() {
@@ -333,16 +333,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('algorithms-container').style.display = 'none';
     document.getElementById('mazes-container').style.display = 'none';
     document.getElementById('speeds-container').style.display = 'none';
-  })
+    algoBtn.innerHTML = 'Algorithms <i class="icon fa-solid fa-caret-down"></i>';
+    mazeBtn.innerHTML = 'Mazes & Patterns <i class="icon fa-solid fa-caret-down"></i>';
+    speedBtn.innerHTML = 'Speed <i class="icon fa-solid fa-caret-down"></i>';
+  });
 });
 
 document.getElementById('bfs').addEventListener('click', () => {
   algorithm = bfs;
-})
+});
 
 document.getElementById('dfs').addEventListener('click', () => {
   algorithm = dfs;
-})
+});
 
 document.getElementById('reset').addEventListener('click', () => {
   if (algorithmRunning) return;
@@ -365,7 +368,7 @@ document.getElementById('reset').addEventListener('click', () => {
   previousPoint = null;
   previousGoalType = 'unvisited';
   previousStartType = 'unvisited';
-})
+});
 
 document.getElementById('start').addEventListener('click', () => {
   // Check if start and goal exist
@@ -374,7 +377,7 @@ document.getElementById('start').addEventListener('click', () => {
   pathChecked = false;
   resetVisited();
   callAlgorithm(algorithm, algorithmSpeed);
-})
+});
 
 // Algorithms
 // Breadth First Search
