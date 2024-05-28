@@ -345,6 +345,7 @@ document.getElementById('dfs').addEventListener('click', () => {
 })
 
 document.getElementById('reset').addEventListener('click', () => {
+  if (algorithmRunning) return;
   resetDomain();
   const startCoords = `${Math.floor(x/4)},${Math.floor(y/2)}`;
   const goalCoords = `${Math.floor(3*x/4)},${Math.floor(y/2)}`;
@@ -369,6 +370,9 @@ document.getElementById('reset').addEventListener('click', () => {
 document.getElementById('start').addEventListener('click', () => {
   // Check if start and goal exist
   if (startPosition == null || goalPosition == null) return;
+  if (algorithmRunning) return;
+  pathChecked = false;
+  resetVisited();
   callAlgorithm(algorithm, algorithmSpeed);
 })
 
@@ -405,9 +409,9 @@ async function bfs(startCoords, goalCoords, delay) {
       if (neighborCoords === goalCoords) {
         cells[goalCoords] = current;
         if (!pathChecked)
-          displayPath(cells, startCoords, goalCoords, delay);
+          await displayPath(cells, startCoords, goalCoords, delay);
         else
-          displayPath(cells, startCoords, goalCoords, 0);
+          await displayPath(cells, startCoords, goalCoords, 0);
         start.classList.remove('visited');
         start.classList.remove('visited-instant');
         pathChecked = true;
@@ -457,9 +461,9 @@ async function dfs(startCoords, goalCoords, delay) {
     // Check if current is goal
     if (currentStringCoords === goalCoords) {
       if (!pathChecked)
-        displayPath(cells, startCoords, goalCoords, delay);
+        await displayPath(cells, startCoords, goalCoords, delay);
       else
-        displayPath(cells, startCoords, goalCoords, 0);
+        await displayPath(cells, startCoords, goalCoords, 0);
       start.classList.remove('visited');
       start.classList.remove('visited-instant');
       pathChecked = true;
