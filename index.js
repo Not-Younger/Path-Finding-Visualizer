@@ -341,10 +341,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.getElementById('bfs').addEventListener('click', () => {
   algorithm = bfs;
+  document.getElementById('start').innerHTML = 'Start BFS';
 });
 
 document.getElementById('dfs').addEventListener('click', () => {
   algorithm = dfs;
+  document.getElementById('start').innerHTML = 'Start DFS';
 });
 
 document.getElementById('reset').addEventListener('click', () => {
@@ -454,13 +456,7 @@ async function dfs(startCoords, goalCoords, delay) {
   while (!s.isEmpty()) {
     const currentStringCoords = s.peek();
     s.pop();
-    // Visit current
     const current = document.getElementById(currentStringCoords);
-    current.classList.remove('unvisited');
-    if (pathChecked)
-      current.classList.add('visited-instant');
-    else
-      current.classList.add('visited');
     // Check if current is goal
     if (currentStringCoords === goalCoords) {
       if (!pathChecked)
@@ -473,6 +469,12 @@ async function dfs(startCoords, goalCoords, delay) {
       algorithmRunning = false;
       return;
     }
+    // Visit current
+    current.classList.remove('unvisited');
+    if (pathChecked)
+      current.classList.add('visited-instant');
+    else
+      current.classList.add('visited');
     // Get current number coords and find neighbors
     const currentCoords = getNumberCoords(currentStringCoords);
     const neighbors = [
