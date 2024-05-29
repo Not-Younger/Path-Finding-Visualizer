@@ -19,6 +19,7 @@ const gridY = Math.round((document.getElementById('table-container').clientHeigh
 
 var algorithm = bfs;
 var algorithmRunning = false;
+var speedText = 'Average';
 var algorithmSpeed = 10;
 
 // Initialize Domain on load
@@ -235,11 +236,11 @@ document.addEventListener('DOMContentLoaded', () => {
     this.classList.toggle('open');
     if (this.classList.contains('open')) {
       document.getElementById('speeds-container').style.display = 'block';
-      speedBtn.innerHTML = 'Speed <i class="icon fa-solid fa-caret-down" style="transform: rotate(180deg)"></i>';
+      speedBtn.innerHTML = `Speed: ${speedText} <i class="icon fa-solid fa-caret-down" style="transform: rotate(180deg)"></i>`;
     }
     else {
       document.getElementById('speeds-container').style.display = 'none';
-      speedBtn.innerHTML = 'Speed <i class="icon fa-solid fa-caret-down"></i>';
+      speedBtn.innerHTML = `Speed: ${speedText} <i class="icon fa-solid fa-caret-down"></i>`;
     }
     document.getElementById('algorithms-container').style.display = 'none';
     document.getElementById('mazes-container').style.display = 'none';
@@ -258,19 +259,39 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('speeds-container').style.display = 'none';
     algoBtn.innerHTML = 'Algorithms <i class="icon fa-solid fa-caret-down"></i>';
     mazeBtn.innerHTML = 'Mazes & Patterns <i class="icon fa-solid fa-caret-down"></i>';
-    speedBtn.innerHTML = 'Speed <i class="icon fa-solid fa-caret-down"></i>';
+    speedBtn.innerHTML = `Speed: ${speedText} <i class="icon fa-solid fa-caret-down"></i>`;
   });
 });
 
-document.getElementById('bfs').addEventListener('click', () => {
-  algorithm = bfs;
-  document.getElementById('start').innerHTML = 'Start BFS';
-});
+const algoButtons = document.getElementsByClassName('algo');
+for (var i = 0; i < algoButtons.length; i++) {
+  algoButtons[i].addEventListener('click', (e) => {
+    const algo = e.target.id;
+    if (algo == 'bfs') {
+      algorithm = bfs;
+    } else if (algo == 'dfs') {
+      algorithm = dfs;
+    }
+    document.getElementById('start').innerHTML = `Start ${algo.toUpperCase()}`;
+  })
+}
 
-document.getElementById('dfs').addEventListener('click', () => {
-  algorithm = dfs;
-  document.getElementById('start').innerHTML = 'Start DFS';
-});
+const speedButtons = document.getElementsByClassName('speed');
+for (var i = 0; i < speedButtons.length; i++) {
+  speedButtons[i].addEventListener('click', (e) => {
+    const speed = e.target.id;
+    if (speed == 'slow') {
+      algorithmSpeed = 1000;
+    } else if (speed == 'average') {
+      algorithmSpeed = 100;
+    } else if (speed == 'fast') {
+      algorithmSpeed = 10;
+    }
+    speedText = speed.charAt(0).toUpperCase() + speed.slice(1);
+  })
+}
+
+// Maze button
 
 document.getElementById('reset').addEventListener('click', () => {
   if (algorithmRunning) return;
