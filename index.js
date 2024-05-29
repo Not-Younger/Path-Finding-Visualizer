@@ -19,7 +19,7 @@ const gridY = Math.round((document.getElementById('table-container').clientHeigh
 
 var algorithm = bfs;
 var algorithmRunning = false;
-var speedText = 'Average';
+var speedText = 'Fast';
 var algorithmSpeed = 10;
 
 // Initialize Domain on load
@@ -325,3 +325,22 @@ document.getElementById('start').addEventListener('click', async () => {
   algorithmRunning = false;
   pathChecked = true;
 });
+
+document.getElementById('random').addEventListener('click', () => {
+  if (algorithmRunning) return;
+  // resetDomain();
+  basicRandomMaze(gridX, gridY);
+})
+
+function basicRandomMaze(gridX, gridY) {
+  const cells = document.getElementsByTagName('td');
+  var numObstacles = Math.floor(gridX * gridY / 4);
+  while (numObstacles > 0) {
+    const cell = cells[Math.floor(Math.random() * cells.length)];
+    if (cell.classList.contains('obstacle')) continue;
+    if (cell.classList.contains('start') || cell.classList.contains('goal')) continue;
+    removeClasses(cell.id);
+    cell.classList.add('obstacle');
+    numObstacles--;
+  }
+}
