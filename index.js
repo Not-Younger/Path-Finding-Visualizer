@@ -112,10 +112,10 @@ function toggleDarkMode() {
 // Global event listeners
 document.addEventListener('mousedown', () => {
   isMouseDown = true;
-})
+});
 document.addEventListener('mouseup', () => {
   isMouseDown = false;
-})
+});
 
 // Make domain
 function makeDomain() {
@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('algorithms-container').style.display = 'none';
     document.getElementById('mazes-container').style.display = 'none';
   });
-  document.addEventListener('mousedown', (e) => {
+  document.addEventListener('click', (e) => {
     if (e.target == algoBtn || e.target == mazeBtn || e.target == speedBtn) return;
     if (e.target.classList.contains('icon')) return;
     algoBtn.classList.add('closed');
@@ -333,10 +333,24 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('algorithms-container').style.display = 'none';
     document.getElementById('mazes-container').style.display = 'none';
     document.getElementById('speeds-container').style.display = 'none';
-  })
+    algoBtn.innerHTML = 'Algorithms <i class="icon fa-solid fa-caret-down"></i>';
+    mazeBtn.innerHTML = 'Mazes & Patterns <i class="icon fa-solid fa-caret-down"></i>';
+    speedBtn.innerHTML = 'Speed <i class="icon fa-solid fa-caret-down"></i>';
+  });
+});
+
+document.getElementById('bfs').addEventListener('click', () => {
+  algorithm = bfs;
+  document.getElementById('start').innerHTML = 'Start BFS';
+});
+
+document.getElementById('dfs').addEventListener('click', () => {
+  algorithm = dfs;
+  document.getElementById('start').innerHTML = 'Start DFS';
 });
 
 document.getElementById('reset').addEventListener('click', () => {
+  if (algorithmRunning) return;
   resetDomain();
   const startCoords = `${Math.floor(x/4)},${Math.floor(y/2)}`;
   const goalCoords = `${Math.floor(3*x/4)},${Math.floor(y/2)}`;
@@ -356,13 +370,16 @@ document.getElementById('reset').addEventListener('click', () => {
   previousPoint = null;
   previousGoalType = 'unvisited';
   previousStartType = 'unvisited';
-})
+});
 
 document.getElementById('start').addEventListener('click', () => {
   // Check if start and goal exist
   if (startPosition == null || goalPosition == null) return;
+  if (algorithmRunning) return;
+  pathChecked = false;
+  resetVisited();
   callAlgorithm(algorithm, algorithmSpeed);
-})
+});
 
 // Algorithms
 // Breadth First Search
@@ -397,9 +414,9 @@ async function bfs(startCoords, goalCoords, delay) {
       if (neighborCoords === goalCoords) {
         cells[goalCoords] = current;
         if (!pathChecked)
-          displayPath(cells, startCoords, goalCoords, delay);
+          await displayPath(cells, startCoords, goalCoords, delay);
         else
-          displayPath(cells, startCoords, goalCoords, 0);
+          await displayPath(cells, startCoords, goalCoords, 0);
         start.classList.remove('visited');
         start.classList.remove('visited-instant');
         pathChecked = true;
@@ -439,25 +456,25 @@ async function dfs(startCoords, goalCoords, delay) {
   while (!s.isEmpty()) {
     const currentStringCoords = s.peek();
     s.pop();
-    // Visit current
     const current = document.getElementById(currentStringCoords);
-    current.classList.remove('unvisited');
-    if (pathChecked)
-      current.classList.add('visited-instant');
-    else
-      current.classList.add('visited');
     // Check if current is goal
     if (currentStringCoords === goalCoords) {
       if (!pathChecked)
-        displayPath(cells, startCoords, goalCoords, delay);
+        await displayPath(cells, startCoords, goalCoords, delay);
       else
-        displayPath(cells, startCoords, goalCoords, 0);
+        await displayPath(cells, startCoords, goalCoords, 0);
       start.classList.remove('visited');
       start.classList.remove('visited-instant');
       pathChecked = true;
       algorithmRunning = false;
       return;
     }
+    // Visit current
+    current.classList.remove('unvisited');
+    if (pathChecked)
+      current.classList.add('visited-instant');
+    else
+      current.classList.add('visited');
     // Get current number coords and find neighbors
     const currentCoords = getNumberCoords(currentStringCoords);
     const neighbors = [
