@@ -23,7 +23,7 @@ var speedText = 'Fast';
 var algorithmSpeed = 10;
 
 // Initialize Domain on load
-makeDomain();
+makeDomain(gridX, gridY);
 
 // Dark mode function
 function toggleDarkMode() {
@@ -44,12 +44,12 @@ document.addEventListener('mouseup', () => {
 });
 
 // Make domain
-function makeDomain() {
+function makeDomain(width, height) {
   var container = document.getElementById('table-container');
   var table = document.createElement('table');
-  for (var i = gridY-1; i >= 0; i--) {
+  for (var i = height-1; i >= 0; i--) {
     var row = document.createElement('tr');
-    for (var j = 0; j < gridX; j++) {
+    for (var j = 0; j < width; j++) {
       var cell = document.createElement('td');
       cell.id = `${j},${i}`;
       cell.addEventListener('mousedown', e => clickable(e));
@@ -65,8 +65,8 @@ function makeDomain() {
   container.appendChild(table);
 
   // Add start and goal positions
-  const startCoords = `${Math.floor(gridX/4)},${Math.floor(gridY/2)}`;
-  const goalCoords = `${Math.floor(3*gridX/4)},${Math.floor(gridY/2)}`;
+  const startCoords = `${Math.floor(width/4)},${Math.floor(height/2)}`;
+  const goalCoords = `${Math.floor(3*width/4)},${Math.floor(height/2)}`;
   const start = document.getElementById(startCoords);
   const goal = document.getElementById(goalCoords);
   start.classList.remove('unvisited');
