@@ -1,5 +1,5 @@
 import { Queue, Stack } from './data-structures.js';
-import { getNumberCoords, getStringCoords, checkValid, displayPath } from './helpers.js';
+import { getStringCoords, displayPath } from './helpers.js';
 
 // Algorithms
 // Breadth First Search
@@ -14,6 +14,7 @@ async function bfs(grid, pathChecked, delay) {
   const q = new Queue();
   // Initialize queue with start
   const start = document.getElementById(startStringCoords);
+  const goal = document.getElementById(goalStringCoords);
   start.classList.add('visited');
   cells[startStringCoords] = '0';
   q.enqueue(startCoords);
@@ -33,7 +34,7 @@ async function bfs(grid, pathChecked, delay) {
       const neighbor = document.getElementById(neighborStringCoords);
       if (neighbor.classList.contains('visited') || neighbor.classList.contains('visited-instant')) continue;
       // Check if neighbor is goal
-      if (neighborStringCoords === goalStringCoords) {
+      if (neighbor === goal) {
         cells[goalStringCoords] = currentStringCoords;
         if (!pathChecked)
           await displayPath(grid, cells, delay);
@@ -59,26 +60,32 @@ async function bfs(grid, pathChecked, delay) {
   start.classList.remove('visited-instant');
 }
 
-async function dfs(startCoords, goalCoords, gridX, gridY, pathChecked, delay) {
+// Depth First Search
+async function dfs(grid, pathChecked, delay) {
+  const startCoords = grid.start;
+  const goalCoords = grid.goal;
+  const startStringCoords = getStringCoords(startCoords);
+  const goalStringCoords = getStringCoords(goalCoords);
   // Map of coords: previous coords
   let cells = {};
   // Stack of string coords
-  const s = new Stack(gridX * gridY);
+  const s = new Stack(grid.width * grid.height);
   // Initialize queue with start
-  const start = document.getElementById(startCoords);
-  // start.classList.add('visited');
-  cells[startCoords] = '0';
+  const start = document.getElementById(startStringCoords);
+  const goal = document.getElementById(goalStringCoords);
+  cells[startStringCoords] = '0';
   s.push(startCoords);
   while (!s.isEmpty()) {
-    const currentStringCoords = s.peek();
+    const currentCoords = s.peek();
+    const currentStringCoords = getStringCoords(currentCoords);
     s.pop();
     const current = document.getElementById(currentStringCoords);
     // Check if current is goal
-    if (currentStringCoords === goalCoords) {
+    if (current === goal) {
       if (!pathChecked)
-        await displayPath(cells, startCoords, goalCoords, delay);
+        await displayPath(grid, cells, delay);
       else
-        await displayPath(cells, startCoords, goalCoords, 0);
+        await displayPath(grid, cells, 0);
       start.classList.remove('visited');
       start.classList.remove('visited-instant');
       return;
@@ -90,7 +97,6 @@ async function dfs(startCoords, goalCoords, gridX, gridY, pathChecked, delay) {
     else
       current.classList.add('visited');
     // Get current number coords and find neighbors
-    const currentCoords = getNumberCoords(currentStringCoords);
     const neighbors = [
       [currentCoords[0] - 1, currentCoords[1]],
       [currentCoords[0], currentCoords[1] - 1],
@@ -99,11 +105,11 @@ async function dfs(startCoords, goalCoords, gridX, gridY, pathChecked, delay) {
     ];
     // Add neighbors
     for (var i = 0; i < neighbors.length; i++) {
-      if (!checkValid(neighbors[i], gridX, gridY)) continue;
+      if (!grid.checkValid(neighbors[i])) continue;
       const neighborStringCoords = getStringCoords(neighbors[i]);
       const neighbor = document.getElementById(neighborStringCoords);
       if (neighbor.classList.contains('visited') || neighbor.classList.contains('visited-instant')) continue;
-      s.push(neighborStringCoords);
+      s.push(neighbors[i]);
       cells[neighborStringCoords] = currentStringCoords;
       if (!pathChecked)
         await new Promise(resolve => setTimeout(resolve, delay));

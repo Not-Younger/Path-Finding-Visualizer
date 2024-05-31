@@ -10,43 +10,6 @@ function getStringCoords(coords) {
   return stringCoords;
 }
 
-function checkValid(coords, gridX, gridY) {
-  const cell = document.getElementById(getStringCoords(coords));
-  if (coords[0] < 0 || coords[0] >= gridX) return false;
-  if (coords[1] < 0 || coords[1] >= gridY) return false;
-  if (cell.classList.contains('obstacle')) return false;
-  return true;
-}
-
-function resetDomain() {
-  const cells = document.getElementsByTagName('td');
-  for (var i = 0; i < cells.length; i++) {
-    const cell = cells[i];
-    removeClasses(cell.id);
-    cell.classList.add('unvisited');
-  }
-}
-
-function resetVisited() {
-  const cells = document.getElementsByTagName('td');
-  for (var i = 0; i < cells.length; i++) {
-    const cell = cells[i];
-    if (cell.classList.contains('obstacle')) continue;
-    if (cell.classList.contains('goal')) continue;
-    if (cell.classList.contains('start')) continue;
-    if (cell.classList.contains('goal-after')) {
-      removeClasses(cell.id);
-      cell.classList.add('goal');
-    } else if (cell.classList.contains('start-after')) {
-      removeClasses(cell.id);
-      cell.classList.add('start');
-    } else {
-      removeClasses(cell.id);
-      cell.classList.add('unvisited');
-    }
-  }
-}
-
 function removeClasses(id) {
   const cell = document.getElementById(id);
   cell.classList.remove('obstacle');
@@ -99,4 +62,4 @@ async function callAlgorithm(grid, algorithm, pathChecked, delay=0) {
   await algorithm(grid, pathChecked, delay);
 }
 
-export { getNumberCoords, getStringCoords, checkValid, resetDomain, resetVisited, removeClasses, displayPath, callAlgorithm };
+export { getNumberCoords, getStringCoords, removeClasses, displayPath, callAlgorithm };
