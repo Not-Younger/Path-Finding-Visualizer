@@ -3,19 +3,23 @@ import { getNumberCoords, getStringCoords, checkValid, displayPath } from './hel
 
 // Algorithms
 // Breadth First Search
-async function bfs(startCoords, goalCoords, gridX, gridY, pathChecked, delay) {
+async function bfs(grid, pathChecked, delay) {
+  const startCoords = grid.start;
+  const goalCoords = grid.goal;
+  const startStringCoords = getStringCoords(startCoords);
+  const goalStringCoords = getStringCoords(goalCoords);
   // Map of coords: previous coords
   let cells = {};
   // Queue of string coords
   const q = new Queue();
   // Initialize queue with start
-  const start = document.getElementById(startCoords);
+  const start = document.getElementById(startStringCoords);
   start.classList.add('visited');
-  cells[startCoords] = '0';
+  cells[startStringCoords] = '0';
   q.enqueue(startCoords);
   while (!q.isEmpty) {
-    const current = q.dequeue();
-    const currentCoords = getNumberCoords(current);
+    const currentCoords = q.dequeue();
+    const currentStringCoords = getStringCoords(currentCoords);
     const neighbors = [
       [currentCoords[0], currentCoords[1] + 1],
       [currentCoords[0] + 1, currentCoords[1]],
@@ -24,17 +28,17 @@ async function bfs(startCoords, goalCoords, gridX, gridY, pathChecked, delay) {
     ];
     // Visit neighbors
     for (var i = 0; i < neighbors.length; i++) {
-      if (!checkValid(neighbors[i], gridX, gridY)) continue;
-      const neighborCoords = getStringCoords(neighbors[i]);
-      const neighbor = document.getElementById(neighborCoords);
+      if (!grid.checkValid(neighbors[i])) continue;
+      const neighborStringCoords = getStringCoords(neighbors[i]);
+      const neighbor = document.getElementById(neighborStringCoords);
       if (neighbor.classList.contains('visited') || neighbor.classList.contains('visited-instant')) continue;
       // Check if neighbor is goal
-      if (neighborCoords === goalCoords) {
-        cells[goalCoords] = current;
+      if (neighborStringCoords === goalStringCoords) {
+        cells[goalStringCoords] = currentStringCoords;
         if (!pathChecked)
-          await displayPath(cells, startCoords, goalCoords, delay);
+          await displayPath(grid, cells, delay);
         else
-          await displayPath(cells, startCoords, goalCoords, 0);
+          await displayPath(grid, cells, 0);
         start.classList.remove('visited');
         start.classList.remove('visited-instant');
         return;
@@ -45,8 +49,8 @@ async function bfs(startCoords, goalCoords, gridX, gridY, pathChecked, delay) {
         neighbor.classList.add('visited-instant');
       else
         neighbor.classList.add('visited');
-      cells[neighborCoords] = current;
-      q.enqueue(neighborCoords);
+      cells[neighborStringCoords] = currentStringCoords;
+      q.enqueue(neighbors[i]);
       if (!pathChecked)
         await new Promise(resolve => setTimeout(resolve, delay));
     }

@@ -61,20 +61,25 @@ function removeClasses(id) {
   cell.classList.remove('goal-after');
 }
 
-async function displayPath(cells, startCoords, goalCoords, delay) {
+async function displayPath(grid, cells, delay) {
+  const startCoords = grid.start;
+  const goalCoords = grid.goal;
+  const startStringCoords = getStringCoords(startCoords);
+  const goalStringCoords = getStringCoords(goalCoords);
+
   // Get result path
   let resultPath = [];
-  let current = goalCoords;
+  let current = goalStringCoords;
   while (current != '0') {
     resultPath.push(current);
     current = cells[current];
   }
-  document.getElementById(startCoords).classList.remove('start');
-  document.getElementById(startCoords).classList.add('start-after');
+  document.getElementById(startStringCoords).classList.remove('start');
+  document.getElementById(startStringCoords).classList.add('start-after');
   // Add path class to path
   for (let i = resultPath.length - 1; i >= 0; i--) {
-    if (resultPath[i] == startCoords) continue;
-    if (resultPath[i] == goalCoords) continue;
+    if (resultPath[i] == startStringCoords) continue;
+    if (resultPath[i] == goalStringCoords) continue;
     const cell = document.getElementById(resultPath[i]);
     cell.classList.remove('visited');
     cell.classList.remove('visited-instant');
@@ -86,12 +91,12 @@ async function displayPath(cells, startCoords, goalCoords, delay) {
       cell.classList.add('path-instant');
     }
   }
-  document.getElementById(goalCoords).classList.remove('goal');
-  document.getElementById(goalCoords).classList.add('goal-after');
+  document.getElementById(goalStringCoords).classList.remove('goal');
+  document.getElementById(goalStringCoords).classList.add('goal-after');
 }
 
-async function callAlgorithm(algorithm, startPosition, goalPosition, gridX, gridY, pathChecked, delay=0) {
-  await algorithm(startPosition, goalPosition, gridX, gridY, pathChecked, delay);
+async function callAlgorithm(grid, algorithm, pathChecked, delay=0) {
+  await algorithm(grid, pathChecked, delay);
 }
 
 export { getNumberCoords, getStringCoords, checkValid, resetDomain, resetVisited, removeClasses, displayPath, callAlgorithm };

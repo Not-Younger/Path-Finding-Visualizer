@@ -23,7 +23,7 @@ var speedText = 'Fast';
 var algorithmSpeed = 10;
 
 // Initialize Domain on load
-makeDomain(gridX, gridY);
+// makeDomain(gridX, gridY);
 
 // Dark mode function
 function toggleDarkMode() {
@@ -42,6 +42,7 @@ document.addEventListener('mousedown', () => {
 document.addEventListener('mouseup', () => {
   isMouseDown = false;
 });
+document.addEventListener('mouseup', (e) => focus(e));
 
 // Make domain
 function makeDomain(width, height) {
@@ -87,7 +88,7 @@ function clickable(e) {
   if (cell.classList.contains('start') || cell.classList.contains('goal') || cell.classList.contains('start-after') || cell.classList.contains('goal-after')) {
     if (pathChecked) {
       resetVisited();
-      callAlgorithm(algorithm, startPosition, goalPosition, gridX, gridY, pathChecked, algorithmSpeed);
+      callAlgorithm(g, algorithm, pathChecked, algorithmSpeed);
     }
   }
   // Make cell an obstacle
@@ -120,18 +121,17 @@ function drawable(e) {
 }
 
 function focus(e) {
-  const cell = e.target;
-  if (cell.id == startPosition) {
+  if (e.type == 'mouseup') {
+    focusStart = false;
+    focusGoal = false;
+  }
+  else if (e.target.id == startPosition) {
     focusStart = true;
     focusGoal = false;
   }
-  else if (cell.id == goalPosition) {
+  else if (e.target.id == goalPosition) {
     focusGoal = true;
     focusStart = false;
-  }
-  else {
-    focusStart = false;
-    focusGoal = false;
   }
 }
 
@@ -161,6 +161,7 @@ function draggable(e) {
     removeClasses(cell.id);
     cell.classList.add('goal');
     goalPosition = cell.id;
+    g.goal = getNumberCoords(goalPosition);
   }
   else if (focusStart) {
     if (cell.classList.contains('goal') || cell.classList.contains('goal-after')) return;
@@ -178,10 +179,11 @@ function draggable(e) {
     removeClasses(cell.id);
     cell.classList.add('start');
     startPosition = cell.id;
+    g.start = getNumberCoords(startPosition);
   }
   if (pathChecked) {
     resetVisited();
-    callAlgorithm(algorithm, startPosition, goalPosition, gridX, gridY, pathChecked, algorithmSpeed);
+    callAlgorithm(g, algorithm, pathChecked, algorithmSpeed);
   }
   previousPoint = cell;
 }
@@ -321,7 +323,7 @@ document.getElementById('start').addEventListener('click', async () => {
   algorithmRunning = true;
   pathChecked = false;
   resetVisited();
-  callAlgorithm(algorithm, startPosition, goalPosition, gridX, gridY, pathChecked, algorithmSpeed);
+  callAlgorithm(g, algorithm, pathChecked, algorithmSpeed);
   algorithmRunning = false;
   pathChecked = true;
 });
@@ -329,12 +331,12 @@ document.getElementById('start').addEventListener('click', async () => {
 document.getElementById('random').addEventListener('click', () => {
   if (algorithmRunning) return;
   // resetDomain();
-  basicRandomMaze(gridX, gridY);
+  basicRandomMaze(g);
 })
 
-function basicRandomMaze(gridX, gridY) {
+function basicRandomMaze(grid) {
   const cells = document.getElementsByTagName('td');
-  var numObstacles = Math.floor(gridX * gridY / 4);
+  var numObstacles = Math.floor(grid.width * grid.height / 4);
   while (numObstacles > 0) {
     const cell = cells[Math.floor(Math.random() * cells.length)];
     if (cell.classList.contains('obstacle')) continue;
@@ -344,3 +346,156 @@ function basicRandomMaze(gridX, gridY) {
     numObstacles--;
   }
 }
+
+async function addBorderMaze(gridX, gridY) {
+  const cells = document.getElementsByTagName('td');
+  for (var i = 0; i < cells.length; i++) {
+    const cell = cells[i];
+    const coords = getNumberCoords(cell.id);
+    if (coords[0] == 0 || coords[0] == gridX - 1 || coords[1] == 0 || coords[1] == gridY - 1) {
+      cell.classList.remove('unvisited');
+      cell.classList.add('obstacle');
+      // await new Promise(resolve => setTimeout(resolve, 10));
+    }
+  }
+}
+
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+}
+
+class grid {
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
+    this.domain;
+    this.start;
+    this.goal;
+    
+    // Create HTML domain
+    this.constructDomain();
+    // Create index domain
+    this.constructIndexDomain();
+    // Set start and goal
+    this.createStart();
+    this.createGoal();
+  }
+
+  constructDomain() {
+    var container = document.getElementById('table-container');
+    var table = document.createElement('table');
+    for (var y = this.height-1; y >= 0; y--) {
+      var row = document.createElement('tr');
+      for (var x = 0; x < this.width; x++) {
+        var cell = document.createElement('td');
+        cell.id = `${x},${y}`;
+        cell.addEventListener('mousedown', e => clickable(e));
+        cell.addEventListener('mousemove', e => drawable(e));
+        cell.addEventListener('mousedown', e => focus(e));
+        cell.addEventListener('mousemove', e => draggable(e));
+        cell.classList.add('unvisited');
+        row.appendChild(cell);
+      }
+      table.appendChild(row);
+    }
+    container.appendChild(table);
+  }
+
+  constructIndexDomain() {
+    const domain = [];
+    for (let x = 0; x < this.width; x++) {
+      const row = [];
+      for (let y = 0; y < this.height; y++) {
+        row.push(document.getElementById(`${x},${y}`));
+      }
+      domain.push(row);
+    }
+    this.domain = domain;
+  }
+
+  createStart() {
+    this.start = [Math.floor(this.width/4), Math.floor(this.height/2)];
+    const start = this.index(this.start);
+    start.classList.remove('unvisited');
+    start.classList.add('start');
+    startPosition = getStringCoords(this.start);
+  }
+
+  createGoal() {
+    this.goal = [Math.floor(3*this.width/4), Math.floor(this.height/2)];
+    const goal = this.index(this.goal);
+    goal.classList.remove('unvisited');
+    goal.classList.add('goal');
+    goalPosition = getStringCoords(this.goal);
+  }
+
+  index(coords) {
+    return this.domain[coords[0]][coords[1]];
+  }
+
+  checkValid(coords) {
+    if (coords[0] < 0 || coords[0] >= this.width) return false;
+    if (coords[1] < 0 || coords[1] >= this.height) return false;
+    const cell = this.index(coords);
+    if (cell.classList.contains('obstacle')) return false;
+    return true;
+  }
+
+  resetDomain() {
+    console.log(this.domain);
+    for (var i = 0; i < this.height; i++) {
+      for (var j = 0; j < this.width; j++) {
+        const cell = this.domain[j][i];
+        removeClasses(cell.id);
+        cell.classList.add('unvisited');
+      }
+    }
+  }
+
+  resetObstacle() {
+    console.log(this.domain);
+    for (var i = 0; i < this.height; i++) {
+      for (var j = 0; j < this.width; j++) {
+        const cell = this.domain[j][i];
+        if (cell.classList.contains('obstacle')) {
+          removeClasses(cell.id);
+          cell.classList.add('unvisited');
+        }
+      }
+    }
+  }
+
+  resetVisited() {
+    for (var i = 0; i < this.height; i++) {
+      for (var j = 0; j < this.width; j++) {
+        const cell = this.domain[j][i];
+        if (cell.classList.contains('obstacle')) continue;
+        if (cell.classList.contains('goal')) continue;
+        if (cell.classList.contains('start')) continue;
+        if (cell.classList.contains('goal-after')) {
+          removeClasses(cell.id);
+          cell.classList.add('goal');
+          continue;
+        } else if (cell.classList.contains('start-after')) {
+          removeClasses(cell.id);
+          cell.classList.add('start');
+          continue;
+        }
+        removeClasses(cell.id);
+        cell.classList.add('unvisited');
+      }
+    }
+  }
+}
+
+var g = new grid(gridX, gridY);
+
+
+// console.log(g.checkValid([38, 28]));
+// await new Promise(resolve => setTimeout(resolve, 10000));
+// g.resetDomain();
+// g.resetObstacle();
+// g.resetVisited();
+
+// bfs2(startPosition, goalPosition, gridX, gridY, pathChecked, algorithmSpeed);
+// callAlgorithm(bfs, startPosition, goalPosition, gridX, gridY, pathChecked, algorithmSpeed);
