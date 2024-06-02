@@ -1,8 +1,9 @@
 import { grid } from './grid.js';
 import { bfs, dfs } from './algorithms.js';
-import { getNumberCoords, removeClasses, callAlgorithm } from './helpers.js';
+import { callAlgorithm } from './helpers.js';
 import { state } from './globals.js';
 import { focus } from './event-handlers.js';
+import { basicRandomMaze, primMaze } from './maze.js';
 
 // Global State
 var darkMode = false;
@@ -122,6 +123,22 @@ for (var i = 0; i < algoButtons.length; i++) {
   })
 }
 
+const mazeButtons = document.getElementsByClassName('maze');
+for (var i = 0; i < mazeButtons.length; i++) {
+  mazeButtons[i].addEventListener('click', (e) => {
+    const maze = e.target.id;
+    if (maze == 'random') {
+      g.resetObstacle();
+      basicRandomMaze(g);
+    } else if (maze == 'prim') {
+      g.setDomainMaze();
+      primMaze(g);
+      g.createStart();
+      g.createGoal();
+    }
+  })
+}
+
 const speedButtons = document.getElementsByClassName('speed');
 for (var i = 0; i < speedButtons.length; i++) {
   speedButtons[i].addEventListener('click', (e) => {
@@ -136,8 +153,6 @@ for (var i = 0; i < speedButtons.length; i++) {
     state.algorithmSpeedText = speed.charAt(0).toUpperCase() + speed.slice(1);
   })
 }
-
-// Maze button
 
 document.getElementById('reset').addEventListener('click', () => {
   if (state.algorithmRunning) return;
@@ -163,42 +178,6 @@ document.getElementById('start').addEventListener('click', async () => {
   state.algorithmRunning = false;
   state.pathChecked = true;
 });
-
-document.getElementById('random').addEventListener('click', () => {
-  if (state.algorithmRunning) return;
-  g.resetObstacle();
-  basicRandomMaze(g);
-})
-
-function basicRandomMaze(grid) {
-  const cells = document.getElementsByTagName('td');
-  var numObstacles = Math.floor(grid.width * grid.height / 4);
-  while (numObstacles > 0) {
-    const cell = cells[Math.floor(Math.random() * cells.length)];
-    if (cell.classList.contains('obstacle')) continue;
-    if (cell.classList.contains('start') || cell.classList.contains('goal')) continue;
-    removeClasses(cell.id);
-    cell.classList.add('obstacle');
-    numObstacles--;
-  }
-}
-
-async function addBorderMaze(gridX, gridY) {
-  const cells = document.getElementsByTagName('td');
-  for (var i = 0; i < cells.length; i++) {
-    const cell = cells[i];
-    const coords = getNumberCoords(cell.id);
-    if (coords[0] == 0 || coords[0] == gridX - 1 || coords[1] == 0 || coords[1] == gridY - 1) {
-      cell.classList.remove('unvisited');
-      cell.classList.add('obstacle');
-      // await new Promise(resolve => setTimeout(resolve, 10));
-    }
-  }
-}
-
-function rand(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
-}
 
 // Create grid
 var g = new grid(gridX, gridY, state);

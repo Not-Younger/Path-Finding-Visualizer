@@ -53,19 +53,30 @@ class grid {
   createStart() {
     this.start = [Math.floor(this.width/4), Math.floor(this.height/2)];
     const start = this.index(this.start);
-    start.classList.remove('unvisited');
+    removeClasses(start.id);
     start.classList.add('start');
   }
 
   createGoal() {
     this.goal = [Math.floor(3*this.width/4), Math.floor(this.height/2)];
     const goal = this.index(this.goal);
-    goal.classList.remove('unvisited');
+    removeClasses(goal.id);
     goal.classList.add('goal');
   }
 
   index(coords) {
     return this.domain[coords[0]][coords[1]];
+  }
+
+  setClass(coords, className) {
+    const cell = this.index(coords);
+    removeClasses(cell.id);
+    cell.classList.add(className);
+  }
+
+  hasClass(coords, className) {
+    const cell = this.index(coords);
+    return cell.classList.contains(className);
   }
 
   checkValid(coords) {
@@ -116,6 +127,16 @@ class grid {
         }
         removeClasses(cell.id);
         cell.classList.add('unvisited');
+      }
+    }
+  }
+
+  setDomainMaze() {
+    for (var i = 0; i < this.height; i++) {
+      for (var j = 0; j < this.width; j++) {
+        const cell = this.domain[j][i];
+        removeClasses(cell.id);
+        cell.classList.add('obstacle');
       }
     }
   }

@@ -62,4 +62,6 @@ async function callAlgorithm(grid, algorithm, pathChecked, delay=0) {
   await algorithm(grid, pathChecked, delay);
 }
 
-export { getNumberCoords, getStringCoords, removeClasses, displayPath, callAlgorithm };
+const random_int = (m, M) => m + Math.floor(Math.random() * (M - m))
+
+export { getNumberCoords, getStringCoords, removeClasses, displayPath, callAlgorithm, random_int };
