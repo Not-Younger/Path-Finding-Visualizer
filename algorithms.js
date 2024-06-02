@@ -1,5 +1,5 @@
 import { Queue, Stack } from './data-structures.js';
-import { getStringCoords, displayPath } from './helpers.js';
+import { getStringCoords, getNumberCoords, displayPath } from './helpers.js';
 
 // Algorithms
 // Breadth First Search
@@ -119,4 +119,69 @@ async function dfs(grid, pathChecked, delay) {
   start.classList.remove('visited-instant');
 }
 
-export { bfs, dfs };
+function distanceStart(coords, startCoords) {
+  return Math.abs(coords[0] - startCoords[0]) + Math.abs(coords[1] - startCoords[1]);
+}
+
+function distanceGoal(coords, goalCoords) {
+  return Math.abs(coords[0] - goalCoords[0]) + Math.abs(coords[1] - goalCoords[1]);
+}
+
+function getMinF(cells) {
+  let minF = Infinity;
+  let minCoords = null;
+  for (var coords in cells) {
+    if (cells[coords].f < minF) {
+      minF = cells[coords].f;
+      minCoords = coords;
+    }
+    if (cells[coords].f === minF) {
+      if (cells[coords].h < cells[minCoords].h)
+        minCoords = coords;
+    }
+  }
+  return getNumberCoords(minCoords);
+}
+
+// A* Search
+async function astar(grid, pathChecked, delay) {
+  const startCoords = grid.start;
+  const goalCoords = grid.goal;
+  const cells = {};
+  cells[startCoords] = { g: distanceStart(startCoords, startCoords), h: distanceGoal(startCoords, goalCoords), f: distanceStart(startCoords, startCoords) + distanceGoal(startCoords, goalCoords)};
+  console.log(cells);
+  while (cells) {
+    const currentCoords = getMinF(cells);
+    const current = document.getElementById(getStringCoords(currentCoords));
+    current.classList.add('visited');
+    if (current === document.getElementById(getStringCoords(goalCoords))) {
+      // await displayPath(grid, cells, delay);
+      console.log('found!');
+      return;
+    }
+    delete cells[currentCoords];
+    const neighbors = [
+      [currentCoords[0], currentCoords[1] + 1],
+      [currentCoords[0] + 1, currentCoords[1]],
+      [currentCoords[0], currentCoords[1] - 1],
+      [currentCoords[0] - 1, currentCoords[1]],
+    ];
+    for (var i = 0; i < neighbors.length; i++) {
+      if (!grid.checkValid(neighbors[i])) continue;
+      const neighborCoords = neighbors[i];
+      const neighbor = document.getElementById(getStringCoords(neighborCoords));
+      if (neighbor.classList.contains('visited') || neighbor.classList.contains('visited-instant')) continue;
+      const g = distanceStart(neighborCoords, startCoords);
+      const h = distanceGoal(neighborCoords, goalCoords);
+      const f = g + h;
+      cells[neighborCoords] = { g, h, f };
+    }
+    if (!pathChecked)
+      await new Promise(resolve => setTimeout(resolve, delay));
+  }
+  console.log('not found');
+}
+
+
+
+export { bfs, dfs, astar };

@@ -1,5 +1,5 @@
 import { grid } from './grid.js';
-import { bfs, dfs } from './algorithms.js';
+import { bfs, dfs, astar } from './algorithms.js';
 import { callAlgorithm } from './helpers.js';
 import { state } from './globals.js';
 import { focus } from './event-handlers.js';
@@ -181,4 +181,5 @@ document.getElementById('start').addEventListener('click', async () => {
 
 // Create grid
 var g = new grid(gridX, gridY, state);
-state.algorithm = bfs;
+state.algorithm = astar;
+state.algorithmText = 'BFS';

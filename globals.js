@@ -3,7 +3,7 @@ export const state = {
   focusStart: false,
   focusGoal: false,
   algorithm: null,
-  algorithmText: 'BFS',
+  algorithmText: null,
   algorithmSpeed: 10,
   algorithmSpeedText: 'Fast',
   pathChecked: false,
