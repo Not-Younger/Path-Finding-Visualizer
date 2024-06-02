@@ -3,6 +3,7 @@ import { removeClasses, getStringCoords, getNumberCoords, callAlgorithm } from '
 // User controls
 function clickable(e, grid, state) {
   e.preventDefault();
+  if (state.algorithmRunning) return;
   const cell = e.target;
   state.previousClicked = cell;
   // Can't draw over start or goal, but can recompute path on click
@@ -27,6 +28,7 @@ function drawable(e, state) {
   if (!state.isMouseDown) return;
   if (state.previousClicked == e.target) return;
   if (state.focusStart || state.focusGoal) return;
+  if (state.algorithmRunning) return;
   const cell = e.target;
   state.previousClicked = cell;
   // Can't draw over start or goal

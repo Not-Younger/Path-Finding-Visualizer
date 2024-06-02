@@ -159,7 +159,7 @@ document.getElementById('start').addEventListener('click', async () => {
   state.algorithmRunning = true;
   state.pathChecked = false;
   g.resetVisited();
-  callAlgorithm(g, state.algorithm, state.pathChecked, state.algorithmSpeed);
+  await callAlgorithm(g, state.algorithm, state.pathChecked, state.algorithmSpeed);
   state.algorithmRunning = false;
   state.pathChecked = true;
 });
