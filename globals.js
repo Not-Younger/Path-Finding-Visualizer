@@ -1,0 +1,15 @@
+export const state = {
+  isMouseDown: false,
+  focusStart: false,
+  focusGoal: false,
+  algorithm: null,
+  algorithmText: 'BFS',
+  algorithmSpeed: 10,
+  algorithmSpeedText: 'Fast',
+  pathChecked: false,
+  algorithmRunning: false,
+  previousClicked: null,
+  previousDragged: null,
+  previousStartType: 'unvisited',
+  previousGoalType: 'unvisited',
+};
