@@ -120,11 +120,15 @@ async function dfs(grid, pathChecked, delay) {
 }
 
 function distanceStart(coords, startCoords) {
-  return Math.abs(coords[0] - startCoords[0]) + Math.abs(coords[1] - startCoords[1]);
+  const current = document.getElementById(getStringCoords(coords));
+  const weightCost = current.classList.contains('weight') ? 10 : 1;
+  return Math.abs(coords[0] - startCoords[0]) + Math.abs(coords[1] - startCoords[1]) + weightCost;
 }
 
 function distanceGoal(coords, goalCoords) {
-  return Math.abs(coords[0] - goalCoords[0]) + Math.abs(coords[1] - goalCoords[1]);
+  const current = document.getElementById(getStringCoords(coords));
+  const weightCost = current.classList.contains('weight') ? 10 : 1;
+  return Math.abs(coords[0] - goalCoords[0]) + Math.abs(coords[1] - goalCoords[1]) + weightCost;
 }
 
 function getMinF(cells) {
