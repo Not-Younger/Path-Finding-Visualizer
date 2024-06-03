@@ -161,7 +161,6 @@ document.getElementById('reset').addEventListener('click', () => {
   g.createGoal();
 
   state.pathChecked = false;
-
   state.previousClicked = null;
   state.previousDragged = null;
   state.previousGoalType = 'unvisited';
@@ -182,4 +181,4 @@ document.getElementById('start').addEventListener('click', async () => {
 // Create grid
 var g = new grid(gridX, gridY, state);
 state.algorithm = astar;
-state.algorithmText = 'BFS';
+state.algorithmText = 'A*';

@@ -1,5 +1,5 @@
 import { Queue, Stack } from './data-structures.js';
-import { getStringCoords, getNumberCoords, displayPath } from './helpers.js';
+import { getStringCoords, getNumberCoords, displayPath, removeClasses } from './helpers.js';
 
 // Algorithms
 // Breadth First Search
@@ -147,19 +147,33 @@ function getMinF(cells) {
 async function astar(grid, pathChecked, delay) {
   const startCoords = grid.start;
   const goalCoords = grid.goal;
+  const start = document.getElementById(getStringCoords(startCoords));
+  const goal = document.getElementById(getStringCoords(goalCoords));
   const cells = {};
-  cells[startCoords] = { g: distanceStart(startCoords, startCoords), h: distanceGoal(startCoords, goalCoords), f: distanceStart(startCoords, startCoords) + distanceGoal(startCoords, goalCoords)};
-  console.log(cells);
-  while (cells) {
-    const currentCoords = getMinF(cells);
+  const checked = {};
+  cells[startCoords] = '0';
+  checked[startCoords] = { g: distanceStart(startCoords, startCoords), h: distanceGoal(startCoords, goalCoords), f: distanceStart(startCoords, startCoords) + distanceGoal(startCoords, goalCoords)};
+  console.log(checked);
+  while (checked) {
+    const currentCoords = getMinF(checked);
     const current = document.getElementById(getStringCoords(currentCoords));
-    current.classList.add('visited');
-    if (current === document.getElementById(getStringCoords(goalCoords))) {
-      // await displayPath(grid, cells, delay);
-      console.log('found!');
+    if (current === goal) {
+      if (!pathChecked)
+        await displayPath(grid, cells, delay);
+      else
+        await displayPath(grid, cells, 0);
+      start.classList.remove('visited');
+      start.classList.remove('visited-instant');
+      goal.classList.remove('visited');
+      goal.classList.remove('visited-instant');
       return;
     }
-    delete cells[currentCoords];
+    current.classList.remove('unvisited');
+    if (pathChecked)
+      current.classList.add('visited-instant');
+    else
+      current.classList.add('visited');
+    delete checked[currentCoords];
     const neighbors = [
       [currentCoords[0], currentCoords[1] + 1],
       [currentCoords[0] + 1, currentCoords[1]],
@@ -174,14 +188,16 @@ async function astar(grid, pathChecked, delay) {
       const g = distanceStart(neighborCoords, startCoords);
       const h = distanceGoal(neighborCoords, goalCoords);
       const f = g + h;
-      cells[neighborCoords] = { g, h, f };
+      checked[neighborCoords] = { g, h, f };
+      cells[getStringCoords(neighborCoords)] = currentCoords;
     }
     if (!pathChecked)
       await new Promise(resolve => setTimeout(resolve, delay));
   }
-  console.log('not found');
+  start.classList.remove('visited');
+  start.classList.remove('visited-instant');
+  goal.classList.remove('visited');
+  goal.classList.remove('visited-instant');
 }
-
-
 
 export { bfs, dfs, astar };
