@@ -13,6 +13,19 @@ function basicRandomMaze(grid) {
   }
 }
 
+function basicWeightMaze(grid) {
+  const cells = document.getElementsByTagName('td');
+  var numObstacles = Math.floor(grid.width * grid.height / 4);
+  while (numObstacles > 0) {
+    const cell = cells[Math.floor(Math.random() * cells.length)];
+    if (cell.classList.contains('obstacle')) continue;
+    if (cell.classList.contains('start') || cell.classList.contains('goal')) continue;
+    removeClasses(cell.id);
+    cell.classList.add('weight');
+    numObstacles--;
+  }
+}
+
 async function primMaze(grid) {
   const frontiers = [];
   const x = random_int(0, grid.width);
@@ -44,4 +57,4 @@ async function primMaze(grid) {
   }
 }
 
-export { basicRandomMaze, primMaze };
+export { basicRandomMaze, primMaze, basicWeightMaze };

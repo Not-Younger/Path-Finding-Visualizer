@@ -124,6 +124,10 @@ class grid {
           removeClasses(cell.id);
           cell.classList.add('start');
           continue;
+        } else if (cell.classList.contains('weight')) {
+          removeClasses(cell.id);
+          cell.classList.add('weight');
+          continue;
         }
         removeClasses(cell.id);
         cell.classList.add('unvisited');

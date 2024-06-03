@@ -1,9 +1,9 @@
 import { grid } from './grid.js';
-import { bfs, dfs, astar } from './algorithms.js';
+import { bfs, dfs, astar, dijkstra } from './algorithms.js';
 import { callAlgorithm } from './helpers.js';
 import { state } from './globals.js';
 import { focus } from './event-handlers.js';
-import { basicRandomMaze, primMaze } from './maze.js';
+import { basicRandomMaze, primMaze, basicWeightMaze } from './maze.js';
 
 // Global State
 var darkMode = false;
@@ -12,6 +12,11 @@ var darkMode = false;
 const headerHeight = document.getElementsByTagName('header')[0].clientHeight;
 const gridX = Math.round(document.getElementById('table-container').clientWidth / 25);
 const gridY = Math.round((document.getElementById('table-container').clientHeight - headerHeight) / 25);
+
+// Create grid
+var g = new grid(gridX, gridY, state);
+state.algorithm = bfs;
+state.algorithmText = 'BFS';
 
 // Dark mode function
 function toggleDarkMode() {
@@ -117,6 +122,10 @@ for (var i = 0; i < algoButtons.length; i++) {
       state.algorithm = bfs;
     } else if (algo == 'dfs') {
       state.algorithm = dfs;
+    } else if (algo == 'astar') {
+      state.algorithm = astar;
+    } else if (algo == 'dijkstra') {
+      state.algorithm = dijkstra;
     }
     state.algorithmText = algo.toUpperCase();
     document.getElementById('start').innerHTML = `Start ${state.algorithmText}`;
@@ -135,6 +144,9 @@ for (var i = 0; i < mazeButtons.length; i++) {
       primMaze(g);
       g.createStart();
       g.createGoal();
+    } else if (maze == 'weight') {
+      g.resetObstacle();
+      basicWeightMaze(g);
     }
   })
 }
@@ -177,8 +189,3 @@ document.getElementById('start').addEventListener('click', async () => {
   state.algorithmRunning = false;
   state.pathChecked = true;
 });
-
-// Create grid
-var g = new grid(gridX, gridY, state);
-state.algorithm = astar;
-state.algorithmText = 'A*';

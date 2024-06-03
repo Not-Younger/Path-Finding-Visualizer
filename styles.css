@@ -290,6 +290,24 @@ td {
   animation: placeIn 0.2s ease-in-out;
 }
 
+.warn {
+  animation: fadeWarnIn 1s ease-out;
+  background-color: rgba(196, 15, 15, 0.75)
+}
+
+.warn-instant {
+  background-color: rgba(196, 15, 15, 0.75)
+}
+
+.weight {
+  background-image: url("weight.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  cursor: pointer;
+  animation: placeIn 0.2s ease-in-out;
+}
+
 .start-after {
   background-image: url("start.svg");
   background-position: center;
@@ -352,10 +370,29 @@ td {
   }
   75% {
     transform: scale(1.2);
-    background-color: rgba(0, 217, 159, 0.75)
+    background-color: rgba(0, 217, 159, 0.75);
   }
   100% {
     transform: scale(1.0);
     background-color: rgba(0, 190, 218, 0.75);
+  }
+}
+
+@keyframes fadeWarnIn {
+  0% {
+    transform: scale(.3);
+    background-color: rgba(66, 0, 0, 0.75);
+    border-radius: 100%;
+  }
+  50% {
+    background-color: rgba(179, 27, 27, 0.75);
+  }
+  75% {
+    transform: scale(1.2);
+    background-color: rgba(255, 0, 0, 0.75);
+  }
+  100% {
+    transform: scale(1.0);
+    background-color: rgba(196, 15, 15, 0.75);
   }
 }

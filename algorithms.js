@@ -1,4 +1,4 @@
-import { Queue, Stack } from './data-structures.js';
+import { Queue, Stack, PriorityQueue } from './data-structures.js';
 import { getStringCoords, getNumberCoords, displayPath, removeClasses } from './helpers.js';
 
 // Algorithms
@@ -200,4 +200,77 @@ async function astar(grid, pathChecked, delay) {
   goal.classList.remove('visited-instant');
 }
 
-export { bfs, dfs, astar };
+async function dijkstra(grid, pathChecked, delay) {
+  const startCoords = grid.start;
+  const goalCoords = grid.goal;
+  const startStringCoords = getStringCoords(startCoords);
+  const goalStringCoords = getStringCoords(goalCoords);
+  // Map of coords: previous coords
+  let cells = {};
+  // Priority Queue of string coords
+  const pq = new PriorityQueue();
+  const start = document.getElementById(startStringCoords);
+  const goal = document.getElementById(goalStringCoords);
+  start.classList.add('warn');
+  cells[startStringCoords] = '0';
+  pq.enqueue({ warn: 0, coords: startCoords });
+  while (!pq.isEmpty) {
+    const currentObj = pq.dequeue();
+    const currentStringCoords = getStringCoords(currentObj.coords);
+    const current = document.getElementById(currentStringCoords);
+    current.classList.remove('unvisited');
+    current.classList.remove('warn');
+    current.classList.remove('warn-instant');
+    if (pathChecked)
+      current.classList.add('visited-instant');
+    else
+      current.classList.add('visited');
+    const neighbors = [
+      [currentObj.coords[0], currentObj.coords[1] + 1],
+      [currentObj.coords[0] + 1, currentObj.coords[1]],
+      [currentObj.coords[0], currentObj.coords[1] - 1],
+      [currentObj.coords[0] - 1, currentObj.coords[1]],
+    ];
+    // Add/Update neighbors
+    for (var i = 0; i < neighbors.length; i++) {
+      if (!grid.checkValid(neighbors[i])) continue;
+      const neighborStringCoords = getStringCoords(neighbors[i]);
+      const neighbor = document.getElementById(neighborStringCoords);
+      if (neighbor.classList.contains('visited') || neighbor.classList.contains('visited-instant')) continue;
+      if (neighbor === goal) {
+        cells[goalStringCoords] = currentStringCoords;
+        if (!pathChecked)
+          await displayPath(grid, cells, delay);
+        else
+          await displayPath(grid, cells, 0);
+        start.classList.remove('visited');
+        start.classList.remove('visited-instant');
+        return;
+      }
+      const cost = neighbor.classList.contains('weight') ? 10 : 1;
+      const distance = currentObj.warn + cost;
+      if (neighbor.classList.contains('warn') || neighbor.classList.contains('warn-instant')) {
+        if (distance < neighbors.warn) {
+          neighbor.warn = distance;
+          // neighbor.innerHTML = `<p>${distance}</p>`;
+          cells[neighborStringCoords] = currentStringCoords;
+        } 
+      } else {
+        // neighbor.innerHTML = `<p>${distance}</p>`;
+        cells[neighborStringCoords] = currentStringCoords;
+        pq.enqueue({ warn: distance, coords: neighbors[i] });
+      }
+      neighbor.classList.remove('unvisited');
+      if (!pathChecked)
+        neighbor.classList.add('warn');
+      else
+        neighbor.classList.add('warn-instant');
+    }
+    if (!pathChecked)
+      await new Promise(resolve => setTimeout(resolve, delay));
+  }
+  start.classList.remove('visited');
+  start.classList.remove('visited-instant');
+}
+
+export { bfs, dfs, astar, dijkstra };

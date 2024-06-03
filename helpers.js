@@ -22,6 +22,9 @@ function removeClasses(id) {
   cell.classList.remove('path-instant');
   cell.classList.remove('start-after');
   cell.classList.remove('goal-after');
+  cell.classList.remove('warn');
+  cell.classList.remove('warn-instant');
+  cell.classList.remove('weight');
 }
 
 async function displayPath(grid, cells, delay) {
