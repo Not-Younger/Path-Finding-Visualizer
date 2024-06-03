@@ -1,5 +1,7 @@
 A website designed to help people better understand common pathfinding algorithms in a visual way. 
 
+Try it here: https://not-younger.github.io/Path-Finding-Visualizer/
+
 Project idea came from Clement Mihailescu, but completely reverse engineered by myself and I improved the user experience dramatically by overcoming certain bugs his website had in terms of placing obstacles. I used HTML, CSS, and native Javascript with no external libraries.
 
 Pathfinding Algorithms:
