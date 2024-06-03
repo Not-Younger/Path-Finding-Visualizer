@@ -140,6 +140,7 @@ function getMinF(cells) {
         minCoords = coords;
     }
   }
+  if (typeof minCoords != 'string') return false;
   return getNumberCoords(minCoords);
 }
 
@@ -153,9 +154,9 @@ async function astar(grid, pathChecked, delay) {
   const checked = {};
   cells[startCoords] = '0';
   checked[startCoords] = { g: distanceStart(startCoords, startCoords), h: distanceGoal(startCoords, goalCoords), f: distanceStart(startCoords, startCoords) + distanceGoal(startCoords, goalCoords)};
-  console.log(checked);
   while (checked) {
     const currentCoords = getMinF(checked);
+    if (currentCoords === false) return;
     const current = document.getElementById(getStringCoords(currentCoords));
     if (current === goal) {
       if (!pathChecked)

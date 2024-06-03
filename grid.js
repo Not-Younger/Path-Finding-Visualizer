@@ -101,7 +101,7 @@ class grid {
     for (var i = 0; i < this.height; i++) {
       for (var j = 0; j < this.width; j++) {
         const cell = this.domain[j][i];
-        if (cell.classList.contains('obstacle')) {
+        if (cell.classList.contains('obstacle') || cell.classList.contains('weight')) {
           removeClasses(cell.id);
           cell.classList.add('unvisited');
         }

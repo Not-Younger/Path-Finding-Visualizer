@@ -118,34 +118,46 @@ const algoButtons = document.getElementsByClassName('algo');
 for (var i = 0; i < algoButtons.length; i++) {
   algoButtons[i].addEventListener('click', (e) => {
     const algo = e.target.id;
+    const description = document.getElementById('description');
     if (algo == 'bfs') {
       state.algorithm = bfs;
+      state.algorithmText = 'BFS!';
+      description.innerHTML = '<p>Breadth-first Search is <strong>unweighted</strong> and <strong>guarantees</strong> the shortest path!</p>';
     } else if (algo == 'dfs') {
       state.algorithm = dfs;
+      state.algorithmText = 'DFS!';
+      description.innerHTML = '<p>Depth-first Search is <strong>unweighted</strong> and <strong>does not guarantee</strong> the shortest path!</p>';
     } else if (algo == 'astar') {
       state.algorithm = astar;
+      state.algorithmText = 'A*!';
+      description.innerHTML = '<p>A* Search is <strong>weighted</strong> and <strong>guarantees</strong> the shortest path!</p>';
     } else if (algo == 'dijkstra') {
       state.algorithm = dijkstra;
+      state.algorithmText = 'Dijkstra\'s!';
+      description.innerHTML = '<p>Dijksta\'s Algorithm is <strong>weighted</strong> and <strong>guarantees</strong> the shortest path!</p>';
     }
-    state.algorithmText = algo.toUpperCase();
     document.getElementById('start').innerHTML = `Start ${state.algorithmText}`;
   })
 }
 
 const mazeButtons = document.getElementsByClassName('maze');
 for (var i = 0; i < mazeButtons.length; i++) {
-  mazeButtons[i].addEventListener('click', (e) => {
+  mazeButtons[i].addEventListener('click', async (e) => {
     const maze = e.target.id;
     if (maze == 'random') {
       g.resetObstacle();
+      g.resetVisited();
+      state.pathChecked = false;
       basicRandomMaze(g);
     } else if (maze == 'prim') {
       g.setDomainMaze();
-      primMaze(g);
+      await primMaze(g);
       g.createStart();
       g.createGoal();
     } else if (maze == 'weight') {
       g.resetObstacle();
+      g.resetVisited();
+      state.pathChecked = false;
       basicWeightMaze(g);
     }
   })
@@ -188,4 +200,11 @@ document.getElementById('start').addEventListener('click', async () => {
   await callAlgorithm(g, state.algorithm, state.pathChecked, state.algorithmSpeed);
   state.algorithmRunning = false;
   state.pathChecked = true;
+});
+
+document.getElementById('clear').addEventListener('click', () => {
+  if (state.algorithmRunning) return;
+  g.resetObstacle();
+  g.resetVisited();
+  state.pathChecked = false;
 });

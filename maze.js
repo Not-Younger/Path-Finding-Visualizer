@@ -26,7 +26,7 @@ function basicWeightMaze(grid) {
   }
 }
 
-async function primMaze(grid) {
+async function primMaze(grid, delay) {
   const frontiers = [];
   const x = random_int(0, grid.width);
   const y = random_int(0, grid.height);
@@ -39,7 +39,9 @@ async function primMaze(grid) {
     const x = f[2];
     const y = f[3];
     if (grid.hasClass([x, y], 'obstacle')) {
+      await new Promise(resolve => setTimeout(resolve, delay));
       grid.setClass([f[0], f[1]], 'unvisited');
+      await new Promise(resolve => setTimeout(resolve, delay));
       grid.setClass([x, y], 'unvisited');
       if (( x >= 2) && grid.index([x-2, y], 'obstacle')) {
         frontiers.push([x-1, y, x-2, y]);

@@ -47,8 +47,12 @@ header div {
 }
 
 h1 {
-  color: var(--secondary-color);
   margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: var(--secondary-color);
 }
 
 #contact, #mode {
@@ -84,6 +88,7 @@ ul {
   margin: 0;
   padding: 0;
   list-style: none;
+  text-align: center;
 }
 
 .control {
@@ -226,6 +231,15 @@ ul {
   flex: auto;
 }
 
+/* Description */
+#description {
+  padding-top: 0;
+}
+
+p {
+  font-size: 1.5rem;
+}
+
 /* Grid */
 
 table {
@@ -245,6 +259,7 @@ td {
 
 .obstacle {
   background-color: rgb(52, 73, 94);
+  border-color: rgb(52, 73, 94);
   cursor: pointer;
   animation: placeIn 0.2s ease-in-out;
 }
